@@ -1,0 +1,57 @@
+---
+BasedOnStyle: LLVM
+
+# Indentation
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ContinuationIndentWidth: 0
+ColumnLimit: 0
+
+# Pointer alignment
+PointerAlignment: Right
+
+# Spaces
+SpaceAfterCStyleCast: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeSquareBrackets: false
+SpacesInSquareBrackets: false
+SpacesInParens: Never
+
+# Braces
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: false
+  AfterClass: false
+  AfterControlStatement: Never
+  AfterEnum: false
+  AfterFunction: false
+  AfterNamespace: false
+  AfterStruct: false
+  AfterUnion: false
+  BeforeCatch: true
+  BeforeElse: false
+  BeforeWhile: true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+# else if compacting
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+# switch/case
+IndentCaseLabels: true
+
+# Preserve max 1 blank line
+MaxEmptyLinesToKeep: 1
+
+# Comments
+ReflowComments: false
+
+# Misc
+SortIncludes: Never
+AllowShortBlocksOnASingleLine: Empty
+
