@@ -35,9 +35,9 @@
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-void Colour_HsvToRgb (const sColourHsv_t hsv, ColourRgb_t *rgb);
-void Colour_RgbToHsv (const ColourRgb_t rgb, sColourHsv_t *hsv);
-uint8_t Colour_ScaleBrightness (const uint8_t value, const uint8_t brightness);
+void Colour_HsvToRgb(const sColourHsv_t hsv, ColourRgb_t *rgb);
+void Colour_RgbToHsv(const ColourRgb_t rgb, sColourHsv_t *hsv);
+uint8_t Colour_ScaleBrightness(const uint8_t value, const uint8_t brightness);
 
 #endif /* ENABLE_COLOUR */
 #endif /* SOURCE_UTILITY_COLOUR_H_ */

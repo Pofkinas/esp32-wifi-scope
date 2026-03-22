@@ -51,8 +51,8 @@ typedef enum eTraceLevel {
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool Debug_API_Init (const eBaudrate_t baudrate);
-bool Debug_API_Print (const eTraceLevel_t trace_level, const char *file_trace, const char *file_name, const size_t line_number, const char *format, ...);
+bool Debug_API_Init(const eBaudrate_t baudrate);
+bool Debug_API_Print(const eTraceLevel_t trace_level, const char *file_trace, const char *file_name, const size_t line_number, const char *format, ...);
 
 #endif /* ENABLE_UART_DEBUG */
 #endif /* SOURCE_API_DEBUG_API_H_ */

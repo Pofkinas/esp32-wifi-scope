@@ -32,16 +32,18 @@
  *********************************************************************************************************************/
 
 #if defined(DEBUG_MAIN)
-CREATE_MODULE_NAME (MAIN)
+CREATE_MODULE_NAME(MAIN)
 #else
 CREATE_MODULE_NAME_EMPTY
 #endif /* DEBUG_MAIN */
 
+/* clang-format off */
 static const sTaskDesc_t g_test_thread_attributes = {
     .name = "Test",
     .stack_size = MAIN_TEST_THREAD_STACK_SIZE,
     .priority = eTaskPriority_Normal
 };
+/* clang-format on */
 
 /**********************************************************************************************************************
  * Private variables
@@ -62,14 +64,14 @@ static StaticTask_t g_test_thread_buffer = {0};
  * Prototypes of private functions
  *********************************************************************************************************************/
 
-static void Main_Init (void);
-static void Main_TestThread (void *pvParameters);
+static void Main_Init(void);
+static void Main_TestThread(void *pvParameters);
 
 /**********************************************************************************************************************
  * Definitions of private functions
  *********************************************************************************************************************/
 
-static void Main_Init (void) {
+static void Main_Init(void) {
     bool init_success = true;
 
     if (!CLI_APP_Init(UART_0_BAUDRATE)) {
@@ -105,7 +107,7 @@ static void Main_Init (void) {
 
     if (NULL == g_test_thread) {
         TRACE_ERR("Failed to create test thread\n");
-        
+
         while (1) {}
     }
 
@@ -114,7 +116,7 @@ static void Main_Init (void) {
     return;
 }
 
-static void Main_TestThread (void *pvParameters) {
+static void Main_TestThread(void *pvParameters) {
     while (1) {
         if (BUTTON_TRIGGERED_EVENT == xEventGroupWaitBits(g_start_button_event, BUTTON_TRIGGERED_EVENT, pdTRUE, pdFALSE, pdMS_TO_TICKS(BUTTON_DEBOUNCE_MS))) {
             TRACE_INFO("Button pressed!\n");
@@ -132,7 +134,7 @@ static void Main_TestThread (void *pvParameters) {
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-int app_main (void) {
+int app_main(void) {
     Main_Init();
 
     vTaskDelete(NULL);

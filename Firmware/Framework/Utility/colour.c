@@ -11,23 +11,23 @@
  * Private definitions and macros
  *********************************************************************************************************************/
 
-/// HSV uses a 0-255 hue range instead of 0-360 degrees.
-/// The colour wheel has 6 sectors; 256 / 6 = 42.67, rounded to 43.
+// HSV uses a 0-255 hue range instead of 0-360 degrees.
+// The colour wheel has 6 sectors; 256 / 6 = 42.67, rounded to 43.
 #define HSV_HUE_SECTOR_SIZE 43U
 
-/// Number of colour sectors in the HSV wheel.
+// Number of colour sectors in the HSV wheel.
 #define HSV_SECTOR_COUNT 6U
 
-/// 8-bit maximum value used for saturation/value normalisation.
+// 8-bit maximum value used for saturation/value normalisation.
 #define HSV_CHANNEL_MAX 255U
 
-/// Shift used to normalise the product of two 8-bit values back to [0, 255].
+// Shift used to normalise the product of two 8-bit values back to [0, 255].
 #define HSV_NORMALISE_SHIFT 8U
 
-/// Hue offset for green sector: 120 / 360 * 256 = 85.3 -> 85
+// Hue offset for green sector: 120 / 360 * 256 = 85.3 -> 85
 #define HSV_HUE_OFFSET_GREEN 85U
 
-/// Hue offset for blue sector: 240 / 360 * 256 = 170.7 -> 171
+// Hue offset for blue sector: 240 / 360 * 256 = 170.7 -> 171
 #define HSV_HUE_OFFSET_BLUE 171U
 
 /**********************************************************************************************************************
@@ -41,7 +41,7 @@
 /**********************************************************************************************************************
  * Private variables
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Exported variables and references
  *********************************************************************************************************************/
@@ -49,16 +49,16 @@
 /**********************************************************************************************************************
  * Prototypes of private functions
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Definitions of private functions
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-void Colour_HsvToRgb (const sColourHsv_t hsv, ColourRgb_t *rgb) {
+void Colour_HsvToRgb(const sColourHsv_t hsv, ColourRgb_t *rgb) {
     if (NULL == rgb) {
         return;
     }
@@ -111,12 +111,12 @@ void Colour_HsvToRgb (const sColourHsv_t hsv, ColourRgb_t *rgb) {
         }
     }
 
-    *rgb = ((uint32_t)red << RGB_RED_SHIFT) | ((uint32_t)green << RGB_GREEN_SHIFT) | blue;
+    *rgb = ((uint32_t) red << RGB_RED_SHIFT) | ((uint32_t) green << RGB_GREEN_SHIFT) | blue;
 
     return;
 }
 
-void Colour_RgbToHsv (const ColourRgb_t rgb, sColourHsv_t *hsv) {
+void Colour_RgbToHsv(const ColourRgb_t rgb, sColourHsv_t *hsv) {
     if (NULL == hsv) {
         return;
     }
@@ -127,7 +127,7 @@ void Colour_RgbToHsv (const ColourRgb_t rgb, sColourHsv_t *hsv) {
 
     uint8_t rgb_min = red < green ? (red < blue ? red : blue) : (green < blue ? green : blue);
     uint8_t rgb_max = red > green ? (red > blue ? red : blue) : (green > blue ? green : blue);
-    
+
     uint8_t delta = rgb_max - rgb_min;
 
     hsv->value = rgb_max;
@@ -155,14 +155,15 @@ void Colour_RgbToHsv (const ColourRgb_t rgb, sColourHsv_t *hsv) {
         hue = HSV_HUE_OFFSET_BLUE + HSV_HUE_SECTOR_SIZE * (red - green) / delta;
     }
 
-    if (hue < 0) hue += 256;
+    if (hue < 0)
+        hue += 256;
 
-    hsv->hue = (uint8_t)hue;
+    hsv->hue = (uint8_t) hue;
 
     return;
 }
 
-uint8_t Colour_ScaleBrightness (const uint8_t value, const uint8_t brightness) {
+uint8_t Colour_ScaleBrightness(const uint8_t value, const uint8_t brightness) {
     if (0 == brightness) {
         return 0;
     }

@@ -20,7 +20,7 @@
  * Exported types
  *********************************************************************************************************************/
 
-typedef void (*data_received_callback_t) (const eUart_t uart);
+typedef void (*data_received_callback_t)(const eUart_t uart);
 
 /**********************************************************************************************************************
  * Exported variables
@@ -30,9 +30,9 @@ typedef void (*data_received_callback_t) (const eUart_t uart);
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool UART_Driver_Init (const eUart_t uart, const eBaudrate_t baudrate, data_received_callback_t data_received_callback);
-bool UART_Driver_Send (const eUart_t uart, uint8_t *data, const size_t size);
-bool UART_Driver_ReceiveByte (const eUart_t uart, uint8_t *data);
+bool UART_Driver_Init(const eUart_t uart, const eBaudrate_t baudrate, data_received_callback_t data_received_callback);
+bool UART_Driver_Send(const eUart_t uart, uint8_t *data, const size_t size);
+bool UART_Driver_ReceiveByte(const eUart_t uart, uint8_t *data);
 
 #endif /* ENABLE_UART */
 #endif /* SOURCE_DRIVER_UART_DRIVER_H_ */

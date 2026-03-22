@@ -34,7 +34,7 @@
 #define ENABLE_PWM
 
 /// -- DEBUG UART              // Enable Debug UART functionality
-#define ENABLE_UART_DEBUG                   
+#define ENABLE_UART_DEBUG
 
 /// -- CLI                     // Enable Command Line Interface (CLI) over UART
 #define ENABLE_CLI
@@ -70,7 +70,7 @@
 #define ENABLE_LED_ANIMATION
 
 /// -- Time-of-flight sensors  // Enable VL53L0X sensor
-#define ENABLE_VL53L0X         
+#define ENABLE_VL53L0X
 
 /// -- Motors                  // Enable Motor functionality
 #define ENABLE_MOTOR
@@ -94,7 +94,7 @@
 //-----------------------------------------------------------------------------
 
 #if defined(ENABLE_UART)
-// #define UART1 
+// #define UART1
 // #define UART_1_BAUDRATE eBaudrate_115200
 
 #define UART2 eUart_Debug
@@ -255,7 +255,7 @@
 
 #define BYTE 8
 #define BASE_10 10
-#define MAX_PID_DT 0.5f  // Maximum dt for PID update to avoid large jumps
+#define MAX_PID_DT 0.5f // Maximum dt for PID update to avoid large jumps
 
 //=============================================================================
 // CUSTOM FLAGS

@@ -66,14 +66,14 @@ static sUartDriver_t g_uart_dynamic_lut[eUart_Last] = {0};
  * Prototypes of private functions
  *********************************************************************************************************************/
 
-static bool UART_Driver_CreateFeederThread (const eUart_t uart, sUartDriver_t *driver);
-static void UART_Driver_Feeder (void *pvParameters);
+static bool UART_Driver_CreateFeederThread(const eUart_t uart, sUartDriver_t *driver);
+static void UART_Driver_Feeder(void *pvParameters);
 
 /**********************************************************************************************************************
  * Definitions of private functions
  *********************************************************************************************************************/
 
-static bool UART_Driver_CreateFeederThread (const eUart_t uart, sUartDriver_t *driver) {
+static bool UART_Driver_CreateFeederThread(const eUart_t uart, sUartDriver_t *driver) {
     if (!UART_Config_IsCorrectUart(uart)) {
         return false;
     }
@@ -99,7 +99,7 @@ static bool UART_Driver_CreateFeederThread (const eUart_t uart, sUartDriver_t *d
     return true;
 }
 
-static void UART_Driver_Feeder (void *pvParameters) {
+static void UART_Driver_Feeder(void *pvParameters) {
     if (NULL == pvParameters) {
         return;
     }
@@ -119,7 +119,7 @@ static void UART_Driver_Feeder (void *pvParameters) {
         if (length <= 0) {
             continue;
         }
-        
+
         if (pdTRUE != xSemaphoreTakeRecursive(g_uart_dynamic_lut[uart].mutex, UART_MUTEX_TIMEOUT)) {
             return;
         }
@@ -128,7 +128,7 @@ static void UART_Driver_Feeder (void *pvParameters) {
 
         xSemaphoreGiveRecursive(g_uart_dynamic_lut[uart].mutex);
 
-        if ((ESP_OK == uart_get_buffered_data_len(g_uart_lut[uart].uart_num, (size_t *)&length)) && (length > 0)) {
+        if ((ESP_OK == uart_get_buffered_data_len(g_uart_lut[uart].uart_num, (size_t *) &length)) && (length > 0)) {
             continue;
         }
 
@@ -144,7 +144,7 @@ static void UART_Driver_Feeder (void *pvParameters) {
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-bool UART_Driver_Init (const eUart_t uart, const eBaudrate_t baudrate, data_received_callback_t data_received_callback) {
+bool UART_Driver_Init(const eUart_t uart, const eBaudrate_t baudrate, data_received_callback_t data_received_callback) {
     if (!UART_Config_IsCorrectUart(uart)) {
         return false;
     }
@@ -183,7 +183,7 @@ bool UART_Driver_Init (const eUart_t uart, const eBaudrate_t baudrate, data_rece
     if ((g_uart_lut[uart].rx_buffer_size <= UART_HW_FIFO_LEN(g_uart_lut[uart].uart_num)) || ((g_uart_lut[uart].tx_buffer_size != 0) && (g_uart_lut[uart].tx_buffer_size <= UART_HW_FIFO_LEN(g_uart_lut[uart].uart_num)))) {
         return false;
     }
-    
+
     if (ESP_OK != uart_driver_install(g_uart_lut[uart].uart_num, g_uart_lut[uart].rx_buffer_size, g_uart_lut[uart].tx_buffer_size, 0, NULL, 0)) {
         return false;
     }
@@ -208,7 +208,7 @@ bool UART_Driver_Init (const eUart_t uart, const eBaudrate_t baudrate, data_rece
     }
 
     g_uart_dynamic_lut[uart].mutex = xSemaphoreCreateRecursiveMutexStatic(&g_uart_dynamic_lut[uart].mutex_buffer);
-    
+
     if (NULL == g_uart_dynamic_lut[uart].mutex) {
         return false;
     }
@@ -223,7 +223,7 @@ bool UART_Driver_Init (const eUart_t uart, const eBaudrate_t baudrate, data_rece
     return true;
 }
 
-bool UART_Driver_Send (const eUart_t uart, uint8_t *data, const size_t size) {
+bool UART_Driver_Send(const eUart_t uart, uint8_t *data, const size_t size) {
     if (!UART_Config_IsCorrectUart(uart)) {
         return false;
     }
@@ -241,7 +241,7 @@ bool UART_Driver_Send (const eUart_t uart, uint8_t *data, const size_t size) {
     return (sent_bytes == size);
 }
 
-bool UART_Driver_ReceiveByte (const eUart_t uart, uint8_t *data) {
+bool UART_Driver_ReceiveByte(const eUart_t uart, uint8_t *data) {
     if (!UART_Config_IsCorrectUart(uart)) {
         return false;
     }
@@ -256,7 +256,7 @@ bool UART_Driver_ReceiveByte (const eUart_t uart, uint8_t *data) {
 
     if (pdTRUE != xSemaphoreTakeRecursive(g_uart_dynamic_lut[uart].mutex, UART_MUTEX_TIMEOUT)) {
         return false;
-    }   
+    }
 
     bool is_received = Ring_Buffer_Pop(g_uart_dynamic_lut[uart].ring_buffer, data);
 

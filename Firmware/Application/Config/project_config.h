@@ -25,7 +25,7 @@
 #define ENABLE_PWM
 
 /// -- DEBUG UART              // Enable Debug UART functionality
-#define ENABLE_UART_DEBUG                   
+#define ENABLE_UART_DEBUG
 
 /// -- CLI                     // Enable Command Line Interface (CLI) over UART
 #define ENABLE_CLI
@@ -166,7 +166,7 @@
 
 #define BYTE 8
 #define BASE_10 10
-#define MAX_PID_DT 0.5f  // Maximum dt for PID update to avoid large jumps
+#define MAX_PID_DT 0.5f // Maximum dt for PID update to avoid large jumps
 
 //=============================================================================
 // CUSTOM FLAGS

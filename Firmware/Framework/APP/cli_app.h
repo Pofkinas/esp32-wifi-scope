@@ -26,7 +26,7 @@
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool CLI_APP_Init (const eBaudrate_t baudrate);
+bool CLI_APP_Init(const eBaudrate_t baudrate);
 
 #endif /* ENABLE_CLI */
 #endif /* SOURCE_APP_CLI_APP_H_ */

@@ -27,11 +27,11 @@
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool PWM_Driver_InitAllDevices (void);
-bool PWM_Driver_EnableDevice (const ePwm_t device);
-bool PWM_Driver_DisableDevice (const ePwm_t device);
-bool PWM_Driver_ChangeDutyCycle (const ePwm_t device, const uint32_t value);
-uint32_t PWM_Driver_GetDeviceTimerResolution (const ePwm_t device);
+bool PWM_Driver_InitAllDevices(void);
+bool PWM_Driver_EnableDevice(const ePwm_t device);
+bool PWM_Driver_DisableDevice(const ePwm_t device);
+bool PWM_Driver_ChangeDutyCycle(const ePwm_t device, const uint32_t value);
+uint32_t PWM_Driver_GetDeviceTimerResolution(const ePwm_t device);
 
 #endif /* ENABLE_PWM */
 #endif /* SOURCE_DRIVER_PWM_DRIVER_H_ */

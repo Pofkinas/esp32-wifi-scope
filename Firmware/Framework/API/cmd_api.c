@@ -23,7 +23,7 @@
  *********************************************************************************************************************/
 
 #if defined(DEBUG_CMD_API)
-CREATE_MODULE_NAME (CMD_API)
+CREATE_MODULE_NAME(CMD_API)
 #else
 CREATE_MODULE_NAME_EMPTY
 #endif /* DEBUG_CMD_API */
@@ -31,7 +31,7 @@ CREATE_MODULE_NAME_EMPTY
 /**********************************************************************************************************************
  * Private variables
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Exported variables and references
  *********************************************************************************************************************/
@@ -39,16 +39,16 @@ CREATE_MODULE_NAME_EMPTY
 /**********************************************************************************************************************
  * Prototypes of private functions
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Definitions of private functions
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-eErrorCode_t CMD_API_FindCommand (sMessage_t command, sMessage_t *response, sCmdDesc_t *command_lut, const size_t command_lut_size) {
+eErrorCode_t CMD_API_FindCommand(sMessage_t command, sMessage_t *response, sCmdDesc_t *command_lut, const size_t command_lut_size) {
     if ((NULL == response) || (NULL == command_lut)) {
         TRACE_ERR("Invalid data pointer\n");
 
@@ -60,7 +60,7 @@ eErrorCode_t CMD_API_FindCommand (sMessage_t command, sMessage_t *response, sCmd
 
         return eErrorCode_NULLPTR;
     }
-    
+
     for (size_t command_number = 1; command_number < command_lut_size; command_number++) {
         if (0 != strncmp(command.data, command_lut[command_number].command, command_lut[command_number].command_length)) {
             continue;

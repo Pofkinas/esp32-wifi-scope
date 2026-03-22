@@ -14,7 +14,6 @@
  * Exported types
  *********************************************************************************************************************/
 
-/* clang-format off */
 typedef enum eBaudrate {
     eBaudrate_First = 0,
     eBaudrate_Default = eBaudrate_First,
@@ -31,7 +30,6 @@ typedef enum eBaudrate {
     eBaudrate_2000000,
     eBaudrate_Last
 } eBaudrate_t;
-/* clang-format on */
 
 /**********************************************************************************************************************
  * Exported variables
@@ -41,6 +39,6 @@ typedef enum eBaudrate {
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-uint32_t Baudrate_GetValue (const eBaudrate_t baudrate);
+uint32_t Baudrate_GetValue(const eBaudrate_t baudrate);
 
 #endif /* SOURCE_UTILITY_BAUDRATE_H_ */

@@ -54,11 +54,13 @@ static const sUartApiConst_t g_static_uart_api_lut[eUart_Last] = {
  * Exported variables and references
  *********************************************************************************************************************/
 
+/* clang-format off */
 const sTaskDesc_t g_fsm_thread_attributes = {
     .name = "UART_API",
     .stack_size = UART_API_THREAD_STACK_SIZE,
     .priority = eTaskPriority_Normal
 };
+/* clang-format on */
 
 /**********************************************************************************************************************
  * Prototypes of private functions
@@ -72,11 +74,11 @@ const sTaskDesc_t g_fsm_thread_attributes = {
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-bool UART_Config_IsCorrectUart (const eUart_t uart) {
+bool UART_Config_IsCorrectUart(const eUart_t uart) {
     return (uart >= eUart_First) && (uart < eUart_Last);
 }
 
-const sUartDesc_t *UART_Config_GetUartDesc (const eUart_t uart) {
+const sUartDesc_t *UART_Config_GetUartDesc(const eUart_t uart) {
     if (!UART_Config_IsCorrectUart(uart)) {
         return NULL;
     }
@@ -84,7 +86,7 @@ const sUartDesc_t *UART_Config_GetUartDesc (const eUart_t uart) {
     return &g_static_uart_lut[uart];
 }
 
-const sUartApiConst_t *UART_Config_GetUartApiConst (const eUart_t uart) {
+const sUartApiConst_t *UART_Config_GetUartApiConst(const eUart_t uart) {
     if (!UART_Config_IsCorrectUart(uart)) {
         return NULL;
     }

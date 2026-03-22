@@ -46,7 +46,7 @@
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-eErrorCode_t Custom_CLI_CMD_Led_Blink (sMessage_t arguments, sMessage_t *response);
+eErrorCode_t Custom_CLI_CMD_Led_Blink(sMessage_t arguments, sMessage_t *response);
 
 #endif /* ENABLE_CUSTOM_CMD */
 #endif /* APPLICATION_CUSTOM_CLI_CMD_H_ */

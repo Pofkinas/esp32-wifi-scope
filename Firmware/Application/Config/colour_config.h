@@ -48,8 +48,8 @@ typedef struct sColourHsv {
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool Colour_Config_IsCorrectColour (const eColour_t colour);
-bool Colour_Config_GetRgb (const eColour_t colour, ColourRgb_t *rgb);
-bool Colour_Config_GetHsv (const eColour_t colour, sColourHsv_t *hsv);
+bool Colour_Config_IsCorrectColour(const eColour_t colour);
+bool Colour_Config_GetRgb(const eColour_t colour, ColourRgb_t *rgb);
+bool Colour_Config_GetHsv(const eColour_t colour, sColourHsv_t *hsv);
 
 #endif /* APPLICATION_CONFIG_COLOUR_CONFIG_H_ */

@@ -17,21 +17,21 @@
  * Exported types
  *********************************************************************************************************************/
 
- /* clang-format off */
+/* clang-format off */
 typedef enum eCliDefaultCmd {
     eCliDefaultCmd_First = 0,
     
-    #if defined(ENABLE_LED)
+#if defined(ENABLE_LED)
     eCliDefaultCmd_Led_Set,
     eCliDefaultCmd_Led_Reset,
     eCliDefaultCmd_Led_Toggle,
     eCliDefaultCmd_Led_Blink,
-    #endif /* ENABLE_LED */
+#endif /* ENABLE_LED */
     
-    #if defined(ENABLE_PWM_LED)
+#if defined(ENABLE_PWM_LED)
     eCliDefaultCmd_Pwm_LedSetBrightness,
     eCliDefaultCmd_Pwm_LedPulse,
-    #endif /* ENABLE_PWM_LED */
+#endif /* ENABLE_PWM_LED */
     
     eCliDefaultCmd_RgbToHsv,
     eCliDefaultCmd_HsvToRgb,

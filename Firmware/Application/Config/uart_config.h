@@ -25,12 +25,12 @@
  *********************************************************************************************************************/
 
 typedef enum eUart {
-    eUart_First = 0, 
+    eUart_First = 0,
     eUart_Debug = eUart_First,
     eUart_Last
 } eUart_t;
 
-typedef struct sUartDesc { 
+typedef struct sUartDesc {
     uart_port_t uart_num;
     eBaudrate_t baud;
     uart_word_length_t data_bits;
@@ -64,8 +64,8 @@ extern const sTaskDesc_t g_fsm_thread_attributes;
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool UART_Config_IsCorrectUart (const eUart_t uart);
-const sUartDesc_t *UART_Config_GetUartDesc (const eUart_t uart);
-const sUartApiConst_t *UART_Config_GetUartApiConst (const eUart_t uart);
+bool UART_Config_IsCorrectUart(const eUart_t uart);
+const sUartDesc_t *UART_Config_GetUartDesc(const eUart_t uart);
+const sUartApiConst_t *UART_Config_GetUartApiConst(const eUart_t uart);
 
 #endif /* APPLICATION_CONFIG_UART_CONFIG_H_ */

@@ -28,7 +28,7 @@
  *********************************************************************************************************************/
 
 #if defined(DEBUG_LED_APP)
-CREATE_MODULE_NAME (LED_APP)
+CREATE_MODULE_NAME(LED_APP)
 #else
 CREATE_MODULE_NAME_EMPTY
 #endif /* DEBUG_LED_APP */
@@ -55,14 +55,14 @@ static StaticQueue_t g_led_message_queue_buffer = {0};
 /**********************************************************************************************************************
  * Prototypes of private functions
  *********************************************************************************************************************/
- 
-static void LED_APP_Thread (void *pvParameters);
+
+static void LED_APP_Thread(void *pvParameters);
 
 /**********************************************************************************************************************
  * Definitions of private functions
  *********************************************************************************************************************/
 
-static void LED_APP_Thread (void *pvParameters) {
+static void LED_APP_Thread(void *pvParameters) {
     while (1) {
         // TODO: redefine pdMS_TO_TICKS with guard 0/1, and compilation error if arg time is less than configTICK_RATE_HZ
         // if (pdTRUE != xQueueReceive(g_led_message_queue, &g_received_task, pdMS_TO_TICKS(LED_MESSAGE_QUEUE_TIMEOUT))) {
@@ -73,11 +73,11 @@ static void LED_APP_Thread (void *pvParameters) {
         if (NULL == g_received_task.data) {
             TRACE_ERR("No arguments\n");
         }
-        
+
         switch (g_received_task.task) {
-            #if defined(ENABLE_LED)
+#if defined(ENABLE_LED)
             case eLedTask_Set: {
-                sLedCommon_t *arguments = (sLedCommon_t*) g_received_task.data;
+                sLedCommon_t *arguments = (sLedCommon_t *) g_received_task.data;
 
                 if (NULL == arguments) {
                     TRACE_ERR("No arguments\n");
@@ -94,7 +94,7 @@ static void LED_APP_Thread (void *pvParameters) {
 
                     break;
                 }
-                
+
                 if (!LED_API_TurnOn(arguments->led)) {
                     TRACE_ERR("LED Turn On Failed\n");
 
@@ -105,10 +105,10 @@ static void LED_APP_Thread (void *pvParameters) {
 
                 TRACE_INFO("Led [%d] Set\n", arguments->led);
 
-                Heap_API_Free(arguments);    
+                Heap_API_Free(arguments);
             } break;
             case eLedTask_Reset: {
-                sLedCommon_t *arguments = (sLedCommon_t*) g_received_task.data;
+                sLedCommon_t *arguments = (sLedCommon_t *) g_received_task.data;
 
                 if (NULL == arguments) {
                     TRACE_ERR("No arguments\n");
@@ -139,7 +139,7 @@ static void LED_APP_Thread (void *pvParameters) {
                 Heap_API_Free(arguments);
             } break;
             case eLedTask_Toggle: {
-                sLedCommon_t *arguments = (sLedCommon_t*) g_received_task.data;
+                sLedCommon_t *arguments = (sLedCommon_t *) g_received_task.data;
 
                 if (NULL == arguments) {
                     TRACE_ERR("No arguments\n");
@@ -170,7 +170,7 @@ static void LED_APP_Thread (void *pvParameters) {
                 Heap_API_Free(arguments);
             } break;
             case eLedTask_Blink: {
-                sLedBlink_t *arguments = (sLedBlink_t*) g_received_task.data;
+                sLedBlink_t *arguments = (sLedBlink_t *) g_received_task.data;
 
                 if (NULL == arguments) {
                     TRACE_ERR("No arguments\n");
@@ -216,10 +216,10 @@ static void LED_APP_Thread (void *pvParameters) {
 
                 Heap_API_Free(arguments);
             } break;
-            #endif /* ENABLE_LED */
-            #if defined(ENABLE_PWM_LED)
+#endif /* ENABLE_LED */
+#if defined(ENABLE_PWM_LED)
             case eLedTask_Set_Brightness: {
-                sLedSetBrightness_t *arguments = (sLedSetBrightness_t*) g_received_task.data;
+                sLedSetBrightness_t *arguments = (sLedSetBrightness_t *) g_received_task.data;
 
                 if (NULL == arguments) {
                     TRACE_ERR("No arguments\n");
@@ -258,7 +258,7 @@ static void LED_APP_Thread (void *pvParameters) {
                 Heap_API_Free(arguments);
             } break;
             case eLedTask_Pulse: {
-                sLedPulse_t *arguments = (sLedPulse_t*) g_received_task.data;
+                sLedPulse_t *arguments = (sLedPulse_t *) g_received_task.data;
 
                 if (NULL == arguments) {
                     TRACE_ERR("No arguments\n");
@@ -304,7 +304,7 @@ static void LED_APP_Thread (void *pvParameters) {
 
                 Heap_API_Free(arguments);
             } break;
-            #endif /* ENABLE_PWM_LED */
+#endif /* ENABLE_PWM_LED */
             default: {
                 TRACE_ERR("Task not found\n");
             } break;
@@ -316,7 +316,7 @@ static void LED_APP_Thread (void *pvParameters) {
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-bool LED_APP_Init (void) {
+bool LED_APP_Init(void) {
     if (g_is_initialized) {
         return true;
     }
@@ -325,8 +325,8 @@ bool LED_APP_Init (void) {
         return false;
     }
 
-    g_led_message_queue = xQueueCreateStatic(LED_MESSAGE_QUEUE_CAPACITY, sizeof(sLedCommandDesc_t), (uint8_t*) &g_led_message_queue_storage[0], &g_led_message_queue_buffer);
-    
+    g_led_message_queue = xQueueCreateStatic(LED_MESSAGE_QUEUE_CAPACITY, sizeof(sLedCommandDesc_t), (uint8_t *) &g_led_message_queue_storage[0], &g_led_message_queue_buffer);
+
     if (NULL == g_led_message_queue) {
         return false;
     }
@@ -342,11 +342,11 @@ bool LED_APP_Init (void) {
     return g_is_initialized;
 }
 
-bool LED_APP_AddTask (sLedCommandDesc_t *task_to_message_queue) {
+bool LED_APP_AddTask(sLedCommandDesc_t *task_to_message_queue) {
     if (!g_is_initialized) {
         return false;
-    }   
-    
+    }
+
     if (NULL == task_to_message_queue) {
         return false;
     }

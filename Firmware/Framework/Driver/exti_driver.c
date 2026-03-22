@@ -29,7 +29,7 @@ typedef enum eExtiStatus {
 typedef struct sExtiDynamic {
     gpio_num_t gpio_num;
     eExtiStatus_t status;
-    void (*callback) (void *context);
+    void (*callback)(void *context);
     void *callback_context;
 } sExtiDynamic_t;
 
@@ -37,11 +37,13 @@ typedef struct sExtiDynamic {
  * Private constants
  *********************************************************************************************************************/
 
+/* clang-format off */
 static const gpio_int_type_t g_exti_trigger_type_lut[eExtiTrigger_Last] = {
     [eExtiTrigger_Rising] = GPIO_INTR_POSEDGE,
     [eExtiTrigger_Falling] = GPIO_INTR_NEGEDGE,
     [eExtiTrigger_RisingFalling] = GPIO_INTR_ANYEDGE
 };
+/* clang-format on */
 
 /**********************************************************************************************************************
  * Private variables
@@ -59,13 +61,13 @@ static sExtiDynamic_t g_dynamic_exti_lut[eIo_Last] = {0};
  * Prototypes of private functions
  *********************************************************************************************************************/
 
-static void EXTIx_IRQHandler (void *arg);
+static void EXTIx_IRQHandler(void *arg);
 
 /**********************************************************************************************************************
  * Definitions of private functions
  *********************************************************************************************************************/
 
-static void IRAM_ATTR EXTIx_IRQHandler (void *arg)  {
+static void IRAM_ATTR EXTIx_IRQHandler(void *arg) {
     sExtiDynamic_t *device = (sExtiDynamic_t *) arg;
 
     if (NULL == device) {
@@ -83,7 +85,7 @@ static void IRAM_ATTR EXTIx_IRQHandler (void *arg)  {
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-bool Exti_Driver_InitDevice (const eIo_t exti_device, exti_callback_t exti_callback, void *callback_context) {
+bool Exti_Driver_InitDevice(const eIo_t exti_device, exti_callback_t exti_callback, void *callback_context) {
     if (!IO_Config_IsCorrectIo(exti_device)) {
         return false;
     }
@@ -131,7 +133,7 @@ bool Exti_Driver_InitDevice (const eIo_t exti_device, exti_callback_t exti_callb
     return true;
 }
 
-bool Exti_Driver_DisableIt (const eIo_t exti_device) {
+bool Exti_Driver_DisableIt(const eIo_t exti_device) {
     if (!IO_Config_IsCorrectIo(exti_device)) {
         return false;
     }
@@ -149,7 +151,7 @@ bool Exti_Driver_DisableIt (const eIo_t exti_device) {
     return true;
 }
 
-bool Exti_Driver_EnableIt (const eIo_t exti_device) {
+bool Exti_Driver_EnableIt(const eIo_t exti_device) {
     if (!IO_Config_IsCorrectIo(exti_device)) {
         return false;
     }
@@ -167,7 +169,7 @@ bool Exti_Driver_EnableIt (const eIo_t exti_device) {
     return true;
 }
 
-bool Exti_Driver_SetTriggerType (const eIo_t exti_device, const eExtiTrigger_t trigger_type) {
+bool Exti_Driver_SetTriggerType(const eIo_t exti_device, const eExtiTrigger_t trigger_type) {
     if (!IO_Config_IsCorrectIo(exti_device)) {
         return false;
     }
@@ -183,7 +185,7 @@ bool Exti_Driver_SetTriggerType (const eIo_t exti_device, const eExtiTrigger_t t
     return true;
 }
 
-bool Exti_Driver_ClearFlag (const eIo_t exti_device) {
+bool Exti_Driver_ClearFlag(const eIo_t exti_device) {
     // Note: ESP32 GPIO interrupt flags are automatically cleared when the interrupt is handled
     return true;
 }

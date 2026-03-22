@@ -55,11 +55,11 @@ static const sPwmOcDesc_t g_static_oc_pwm_lut[ePwm_Last] = {
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-bool PWM_Config_IsCorrectPwmDevice (const ePwm_t pwm_channel) {
+bool PWM_Config_IsCorrectPwmDevice(const ePwm_t pwm_channel) {
     return (pwm_channel >= ePwm_First) && (pwm_channel < ePwm_Last);
 }
 
-const sPwmOcDesc_t *PWM_Config_GetPwmOcDesc (const ePwm_t pwm_channel) {
+const sPwmOcDesc_t *PWM_Config_GetPwmOcDesc(const ePwm_t pwm_channel) {
     if ((pwm_channel < ePwm_First) || (pwm_channel >= ePwm_Last)) {
         return NULL;
     }

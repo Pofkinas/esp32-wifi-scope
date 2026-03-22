@@ -48,7 +48,7 @@ typedef struct sPwmOcDesc {
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool PWM_Config_IsCorrectPwmDevice (const ePwm_t pwm_channel);
-const sPwmOcDesc_t *PWM_Config_GetPwmOcDesc (const ePwm_t pwm_channel);
+bool PWM_Config_IsCorrectPwmDevice(const ePwm_t pwm_channel);
+const sPwmOcDesc_t *PWM_Config_GetPwmOcDesc(const ePwm_t pwm_channel);
 
 #endif /* APPLICATION_CONFIG_PWM_CONFIG_H_ */

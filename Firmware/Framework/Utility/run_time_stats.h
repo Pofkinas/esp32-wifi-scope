@@ -20,7 +20,7 @@
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-void configureTimerForRunTimeStats (void);
-unsigned long getRunTimeCounterValue (void);
+void configureTimerForRunTimeStats(void);
+unsigned long getRunTimeCounterValue(void);
 
 #endif /* SOURCE_UTILITY_RUN_TIME_STATS_H_ */

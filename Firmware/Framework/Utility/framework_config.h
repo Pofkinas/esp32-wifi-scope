@@ -15,8 +15,7 @@
  * Project configuration analysis
  *********************************************************************************************************************/
 
-#if (defined(ENABLE_UART) || defined(ENABLE_PWM) || defined(ENABLE_LED) || defined(ENABLE_PWM_LED)\
-    || defined(ENABLE_IO) || defined(ENABLE_EXTI)) && !defined(ENABLE_GPIO)
+#if (defined(ENABLE_UART) || defined(ENABLE_PWM) || defined(ENABLE_LED) || defined(ENABLE_PWM_LED) || defined(ENABLE_IO) || defined(ENABLE_EXTI)) && !defined(ENABLE_GPIO)
 #error "At least one peripheral or module requires GPIO to be enabled."
 #endif /* (ENABLE_UART || ENABLE_PWM || ENABLE_LED || ENABLE_PWM_LED || ENABLE_IO || ENABLE_EXTI ||\
         ) && !ENABLE_GPIO */

@@ -78,8 +78,8 @@ typedef struct sLedPulse {
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool LED_APP_Init (void);
-bool LED_APP_AddTask (sLedCommandDesc_t *task_to_message_queue);
+bool LED_APP_Init(void);
+bool LED_APP_AddTask(sLedCommandDesc_t *task_to_message_queue);
 
 #endif /* defined(ENABLE_LED) || defined(ENABLE_PWM_LED) */
 #endif /* SOURCE_APP_LED_APP_H_ */

@@ -70,8 +70,8 @@ extern const sTaskDesc_t g_io_thread_attributes;
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool IO_Config_IsCorrectIo (const eIo_t io_device);
-const sExtiDesc_t *IO_Config_GetExtiDesc (const eIo_t io_device);
-const sIoDesc_t *IO_Config_GetIoDesc (const eIo_t io_device);
+bool IO_Config_IsCorrectIo(const eIo_t io_device);
+const sExtiDesc_t *IO_Config_GetExtiDesc(const eIo_t io_device);
+const sIoDesc_t *IO_Config_GetIoDesc(const eIo_t io_device);
 
 #endif /* APPLICATION_CONFIG_IO_CONFIG_H_ */

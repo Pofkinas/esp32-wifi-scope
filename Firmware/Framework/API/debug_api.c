@@ -27,7 +27,7 @@
 /**********************************************************************************************************************
  * Private variables
  *********************************************************************************************************************/
- 
+
 static char g_debug_message_buffer[DEBUG_MESSAGE_SIZE] = {0};
 static bool g_is_initialized = false;
 
@@ -41,20 +41,20 @@ static StaticSemaphore_t g_debug_api_mutex_buffer = {0};
 /**********************************************************************************************************************
  * Prototypes of private functions
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Definitions of private functions
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-bool Debug_API_Init (const eBaudrate_t baudrate) {
+bool Debug_API_Init(const eBaudrate_t baudrate) {
     if (g_is_initialized) {
         return true;
     }
-    
+
     if ((baudrate < eBaudrate_First) || (baudrate >= eBaudrate_Last)) {
         return false;
     }
@@ -70,7 +70,7 @@ bool Debug_API_Init (const eBaudrate_t baudrate) {
     return g_is_initialized;
 }
 
-bool Debug_API_Print (const eTraceLevel_t trace_level, const char *file_trace, const char *file_name, const size_t line_number, const char *format, ...) {
+bool Debug_API_Print(const eTraceLevel_t trace_level, const char *file_trace, const char *file_name, const size_t line_number, const char *format, ...) {
     if ((trace_level < eTraceLevel_First) || (trace_level >= eTraceLevel_Last)) {
         return false;
     }
@@ -88,7 +88,7 @@ bool Debug_API_Print (const eTraceLevel_t trace_level, const char *file_trace, c
     size_t written = 0;
 
     va_list arguments;
-    
+
     debug_message.data = g_debug_message_buffer;
 
     switch (trace_level) {
@@ -118,17 +118,17 @@ bool Debug_API_Print (const eTraceLevel_t trace_level, const char *file_trace, c
     written = vsnprintf((debug_message.data + message_length), (DEBUG_MESSAGE_SIZE - message_length), format, arguments);
 
     va_end(arguments);
-    
+
     if (written <= 0) {
         xSemaphoreGiveRecursive(g_debug_api_mutex);
         return false;
     }
 
     message_length += (size_t) written;
-    
+
     debug_message.size = message_length;
     bool is_sent = UART_API_Send(DEBUG_UART, debug_message, DEBUG_MESSAGE_TIMEOUT);
-    
+
     xSemaphoreGiveRecursive(g_debug_api_mutex);
 
     return is_sent;

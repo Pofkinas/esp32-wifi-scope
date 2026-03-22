@@ -53,11 +53,11 @@ static const sGpioDesc_t g_static_gpio_lut[eGpio_Last] = {
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-bool GPIO_Config_IsCorrectGpio (const eGpio_t gpio) {
+bool GPIO_Config_IsCorrectGpio(const eGpio_t gpio) {
     return (gpio >= eGpio_First) && (gpio < eGpio_Last);
 }
 
-const sGpioDesc_t *GPIO_Config_GetGpioDesc (const eGpio_t gpio_pin) {
+const sGpioDesc_t *GPIO_Config_GetGpioDesc(const eGpio_t gpio_pin) {
     if (!GPIO_Config_IsCorrectGpio(gpio_pin)) {
         return NULL;
     }

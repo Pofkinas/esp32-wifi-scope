@@ -15,11 +15,11 @@
  * Exported definitions and macros
  *********************************************************************************************************************/
 
-#if defined(MCU_ESP32_S3) 
-    #define STACK_SIZE_IN_BYTES(x)  (x)
+#if defined(MCU_ESP32_S3)
+#define STACK_SIZE_IN_BYTES(x) (x)
 #endif /* MCU_ESP32_S3 */
 #if defined(MCU_STM32FXX)
-    #define STACK_SIZE_IN_BYTES(x)  ((x) / sizeof(StackType_t))
+#define STACK_SIZE_IN_BYTES(x) ((x) / sizeof(StackType_t))
 #endif /* MCU_STM32FXX */
 
 /**********************************************************************************************************************

@@ -16,7 +16,7 @@
 /**********************************************************************************************************************
  * Private typedef
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Private constants
  *********************************************************************************************************************/
@@ -24,7 +24,7 @@
 /**********************************************************************************************************************
  * Private variables
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Exported variables and references
  *********************************************************************************************************************/
@@ -41,7 +41,7 @@
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-eErrorCode_t CMD_API_Helper_ParseToken (char **token, sMessage_t *argument, char *separator, sMessage_t *response) {
+eErrorCode_t CMD_API_Helper_ParseToken(char **token, sMessage_t *argument, char *separator, sMessage_t *response) {
     if ((NULL == token) || (NULL == separator) || (NULL == response)) {
         return eErrorCode_NULLPTR;
     }
@@ -53,7 +53,7 @@ eErrorCode_t CMD_API_Helper_ParseToken (char **token, sMessage_t *argument, char
     }
 
     *token = strstr(argument->data, separator);
-        
+
     if (NULL != *token) {
         **token = '\0';
     }
@@ -61,7 +61,7 @@ eErrorCode_t CMD_API_Helper_ParseToken (char **token, sMessage_t *argument, char
     return eErrorCode_OK;
 }
 
-eErrorCode_t CMD_API_Helper_FindNextArgUInt (sMessage_t *argument, size_t *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
+eErrorCode_t CMD_API_Helper_FindNextArgUInt(sMessage_t *argument, size_t *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
     char *argument_token = NULL;
     char *invalid_character = NULL;
 
@@ -81,7 +81,7 @@ eErrorCode_t CMD_API_Helper_FindNextArgUInt (sMessage_t *argument, size_t *retur
 
     if (NULL == argument_token) {
         argument->size = 0;
-        
+
         return eErrorCode_OK;
     }
 
@@ -91,7 +91,7 @@ eErrorCode_t CMD_API_Helper_FindNextArgUInt (sMessage_t *argument, size_t *retur
     return eErrorCode_OK;
 }
 
-eErrorCode_t CMD_API_Helper_FindNextArgInt (sMessage_t *argument, int *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
+eErrorCode_t CMD_API_Helper_FindNextArgInt(sMessage_t *argument, int *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
     char *argument_token = NULL;
     char *invalid_character = NULL;
 
@@ -111,7 +111,7 @@ eErrorCode_t CMD_API_Helper_FindNextArgInt (sMessage_t *argument, int *return_ar
 
     if (NULL == argument_token) {
         argument->size = 0;
-        
+
         return eErrorCode_OK;
     }
 
@@ -121,7 +121,7 @@ eErrorCode_t CMD_API_Helper_FindNextArgInt (sMessage_t *argument, int *return_ar
     return eErrorCode_OK;
 }
 
-eErrorCode_t CMD_API_Helper_FindNextArgFloat (sMessage_t *argument, float *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
+eErrorCode_t CMD_API_Helper_FindNextArgFloat(sMessage_t *argument, float *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
     char *argument_token = NULL;
     char *invalid_character = NULL;
 
@@ -141,7 +141,7 @@ eErrorCode_t CMD_API_Helper_FindNextArgFloat (sMessage_t *argument, float *retur
 
     if (NULL == argument_token) {
         argument->size = 0;
-        
+
         return eErrorCode_OK;
     }
 
@@ -151,7 +151,7 @@ eErrorCode_t CMD_API_Helper_FindNextArgFloat (sMessage_t *argument, float *retur
     return eErrorCode_OK;
 }
 
-eErrorCode_t CMD_API_Helper_FindNextArgChar (sMessage_t *argument, char *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
+eErrorCode_t CMD_API_Helper_FindNextArgChar(sMessage_t *argument, char *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
     char *argument_token = NULL;
 
     eErrorCode_t error = CMD_API_Helper_ParseToken(&argument_token, argument, separator, response);
@@ -164,7 +164,7 @@ eErrorCode_t CMD_API_Helper_FindNextArgChar (sMessage_t *argument, char *return_
 
     if (NULL == argument_token) {
         argument->size = 0;
-        
+
         return eErrorCode_OK;
     }
 

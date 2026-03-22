@@ -53,7 +53,7 @@
  *********************************************************************************************************************/
 
 #if defined(DEBUG_CUSTOM_CMD)
-CREATE_MODULE_NAME (CLI_CUSTOM_CMD)
+CREATE_MODULE_NAME(CLI_CUSTOM_CMD)
 #else
 CREATE_MODULE_NAME_EMPTY
 #endif /* DEBUG_CUSTOM_CMD */
@@ -78,7 +78,7 @@ CREATE_MODULE_NAME_EMPTY
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-eErrorCode_t Custom_CLI_CMD_Led_Blink (sMessage_t arguments, sMessage_t *response) {
+eErrorCode_t Custom_CLI_CMD_Led_Blink(sMessage_t arguments, sMessage_t *response) {
     if (NULL == response) {
         TRACE_ERR("Invalid data pointer\n");
 
@@ -90,7 +90,7 @@ eErrorCode_t Custom_CLI_CMD_Led_Blink (sMessage_t arguments, sMessage_t *respons
 
         return eErrorCode_NULLPTR;
     }
-    
+
     eLed_t led;
     size_t led_value = 0;
     size_t blink_time = 0;
@@ -111,7 +111,7 @@ eErrorCode_t Custom_CLI_CMD_Led_Blink (sMessage_t arguments, sMessage_t *respons
     if (eErrorCode_OK != error) {
         return error;
     }
-    
+
     if (0 != arguments.size) {
         snprintf(response->data, response->size, "Too many arguments\n");
 
@@ -143,7 +143,7 @@ eErrorCode_t Custom_CLI_CMD_Led_Blink (sMessage_t arguments, sMessage_t *respons
 
     if (NULL == task_data) {
         snprintf(response->data, response->size, "Failed Calloc\n");
-        
+
         return eErrorCode_NOMEM;
     }
 
@@ -154,7 +154,7 @@ eErrorCode_t Custom_CLI_CMD_Led_Blink (sMessage_t arguments, sMessage_t *respons
 
     if (!LED_APP_AddTask(&formated_task)) {
         snprintf(response->data, response->size, "Failed task add\n");
-        
+
         Heap_API_Free(task_data);
 
         return eErrorCode_FAILED;

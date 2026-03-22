@@ -14,7 +14,7 @@
 /**********************************************************************************************************************
  * Private typedef
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Private constants
  *********************************************************************************************************************/
@@ -42,7 +42,7 @@ static StaticSemaphore_t g_heap_mutex_bufer = {0};
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-bool Heap_API_Init (void) {
+bool Heap_API_Init(void) {
     if (NULL == g_heap_mutex) {
         g_heap_mutex = xSemaphoreCreateRecursiveMutexStatic(&g_heap_mutex_bufer);
     }
@@ -62,7 +62,7 @@ void *Heap_API_MemoryAllocate(const size_t number_of_elements, const size_t size
     if (NULL == g_heap_mutex) {
         return NULL;
     }
-    
+
     if (pdTRUE != xSemaphoreTakeRecursive(g_heap_mutex, HEAP_API_MUTEX_TIMEOUT)) {
         return NULL;
     }
@@ -76,7 +76,7 @@ void *Heap_API_MemoryAllocate(const size_t number_of_elements, const size_t size
     return allocated_memory;
 }
 
-bool Heap_API_Free (void *pointer_to_memory) {
+bool Heap_API_Free(void *pointer_to_memory) {
     if (NULL == pointer_to_memory) {
         return false;
     }
@@ -84,7 +84,7 @@ bool Heap_API_Free (void *pointer_to_memory) {
     if (NULL == g_heap_mutex) {
         return false;
     }
-    
+
     if (pdTRUE != xSemaphoreTakeRecursive(g_heap_mutex, HEAP_API_MUTEX_TIMEOUT)) {
         return false;
     }

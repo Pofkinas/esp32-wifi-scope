@@ -16,15 +16,15 @@
 /**********************************************************************************************************************
  * Private typedef
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Private constants
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Private variables
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Exported variables and references
  *********************************************************************************************************************/
@@ -32,16 +32,16 @@
 /**********************************************************************************************************************
  * Prototypes of private functions
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Definitions of private functions
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-uint32_t Math_Utils_RandomRange (uint32_t min, uint32_t max) {
+uint32_t Math_Utils_RandomRange(uint32_t min, uint32_t max) {
     if (min > max) {
         return 0;
     }
@@ -49,7 +49,7 @@ uint32_t Math_Utils_RandomRange (uint32_t min, uint32_t max) {
     return (rand() % (max + 1 - min)) + min;
 }
 
-uint32_t Math_Utils_MapValue (uint32_t input, uint32_t input_min, uint32_t input_max, uint32_t output_min, uint32_t output_max) {
+uint32_t Math_Utils_MapValue(uint32_t input, uint32_t input_min, uint32_t input_max, uint32_t output_min, uint32_t output_max) {
     if ((input < input_min) || (input > input_max)) {
         return 0;
     }
@@ -57,19 +57,19 @@ uint32_t Math_Utils_MapValue (uint32_t input, uint32_t input_min, uint32_t input
     return ((((input - input_min) * (output_max - output_min)) / (input_max - input_min)) + output_min);
 }
 
-float Math_Utils_DegreesToRadians (float degrees) {
+float Math_Utils_DegreesToRadians(float degrees) {
     return (degrees * (M_PI / 180.0f));
 }
 
-float Math_Utils_RadiansToDegrees (float radians) {
+float Math_Utils_RadiansToDegrees(float radians) {
     return (radians * (180.0f / M_PI));
 }
 
-float Math_Utils_PidUpdate (sPID_t *pid, float set_point, float process_value, float dt) {
+float Math_Utils_PidUpdate(sPID_t *pid, float set_point, float process_value, float dt) {
     if ((NULL == pid) || (dt <= 0.0f)) {
         return 0.0f;
     }
-    
+
     if (dt > MAX_PID_DT) {
         dt = MAX_PID_DT;
     }
@@ -81,7 +81,7 @@ float Math_Utils_PidUpdate (sPID_t *pid, float set_point, float process_value, f
 
     // Integral with anti-windup
     pid->integral += error * dt;
-    
+
     if (pid->integral > pid->integral_limit) {
         pid->integral = pid->integral_limit;
     } else if (pid->integral < -pid->integral_limit) {

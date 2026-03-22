@@ -10,7 +10,7 @@
 /**********************************************************************************************************************
  * Private definitions and macros
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Private typedef
  *********************************************************************************************************************/
@@ -36,27 +36,27 @@ static bool g_is_device_enabled[ePwm_Last] = {false};
 /**********************************************************************************************************************
  * Prototypes of private functions
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Definitions of private functions
  *********************************************************************************************************************/
- 
+
 /**********************************************************************************************************************
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-bool PWM_Driver_InitAllDevices (void) {
+bool PWM_Driver_InitAllDevices(void) {
     if (g_is_all_device_init) {
         return true;
     }
 
     g_is_all_device_init = true;
-    
+
     ledc_timer_config_t timer_config_struct = {0};
 
     for (ePwm_t device = ePwm_First; device < ePwm_Last; device++) {
         const sPwmOcDesc_t *desc = PWM_Config_GetPwmOcDesc(device);
-        
+
         if (NULL == desc) {
             g_is_all_device_init = false;
             return false;
@@ -92,7 +92,7 @@ bool PWM_Driver_InitAllDevices (void) {
     return g_is_all_device_init;
 }
 
-bool PWM_Driver_EnableDevice (const ePwm_t device) {
+bool PWM_Driver_EnableDevice(const ePwm_t device) {
     if (!PWM_Config_IsCorrectPwmDevice(device)) {
         return false;
     }
@@ -114,7 +114,7 @@ bool PWM_Driver_EnableDevice (const ePwm_t device) {
     return true;
 }
 
-bool PWM_Driver_DisableDevice (const ePwm_t device) {
+bool PWM_Driver_DisableDevice(const ePwm_t device) {
     if (!PWM_Config_IsCorrectPwmDevice(device)) {
         return false;
     }
@@ -134,7 +134,7 @@ bool PWM_Driver_DisableDevice (const ePwm_t device) {
     return true;
 }
 
-bool PWM_Driver_ChangeDutyCycle (const ePwm_t device, const uint32_t value) {
+bool PWM_Driver_ChangeDutyCycle(const ePwm_t device, const uint32_t value) {
     if (!PWM_Config_IsCorrectPwmDevice(device)) {
         return false;
     }
@@ -158,7 +158,7 @@ bool PWM_Driver_ChangeDutyCycle (const ePwm_t device, const uint32_t value) {
     return true;
 }
 
-uint32_t PWM_Driver_GetDeviceTimerResolution (const ePwm_t device) {
+uint32_t PWM_Driver_GetDeviceTimerResolution(const ePwm_t device) {
     if (!PWM_Config_IsCorrectPwmDevice(device)) {
         return 0;
     }

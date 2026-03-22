@@ -40,7 +40,7 @@ typedef struct sLedBlinkDesc {
     uint16_t total_blinks;
     uint16_t blink_count;
     bool is_running;
-} sLedBlinkDesc_t; 
+} sLedBlinkDesc_t;
 #endif /* ENABLE_LED */
 
 #if defined(ENABLE_PWM_LED)
@@ -67,7 +67,7 @@ typedef struct sLedPulseDesc {
  *********************************************************************************************************************/
 
 #if defined(DEBUG_LED_API)
-CREATE_MODULE_NAME (LED_API)
+CREATE_MODULE_NAME(LED_API)
 #else
 CREATE_MODULE_NAME_EMPTY
 #endif /* DEBUG_LED_API */
@@ -77,11 +77,11 @@ CREATE_MODULE_NAME_EMPTY
  *********************************************************************************************************************/
 
 #if defined(ENABLE_LED)
-static void LED_API_BlinkTimerCallback (TimerHandle_t xTimer);
+static void LED_API_BlinkTimerCallback(TimerHandle_t xTimer);
 #endif /* ENABLE_LED */
 
 #if defined(ENABLE_PWM_LED)
-static void LED_API_PulseTimerCallback (TimerHandle_t xTimer);
+static void LED_API_PulseTimerCallback(TimerHandle_t xTimer);
 #endif /* ENABLE_PWM_LED */
 
 /**********************************************************************************************************************
@@ -115,8 +115,8 @@ static sLedPwmDesc_t g_pwm_led_desc_lut[eLedPwm_Last] = {0};
  *********************************************************************************************************************/
 
 #if defined(ENABLE_LED)
-static void LED_API_BlinkTimerCallback (TimerHandle_t xTimer) {
-    sLedBlinkDesc_t *led_blink_desc = (sLedBlinkDesc_t*) pvTimerGetTimerID(xTimer);
+static void LED_API_BlinkTimerCallback(TimerHandle_t xTimer) {
+    sLedBlinkDesc_t *led_blink_desc = (sLedBlinkDesc_t *) pvTimerGetTimerID(xTimer);
 
     if (NULL == led_blink_desc) {
         return;
@@ -142,7 +142,7 @@ static void LED_API_BlinkTimerCallback (TimerHandle_t xTimer) {
         xTimerStop(led_blink_desc->blink_timer, BLINK_TIMER_TIMEOUT);
 
         LED_API_TurnOff(led_blink_desc->led);
-        
+
         led_blink_desc->is_running = false;
     }
 
@@ -151,8 +151,8 @@ static void LED_API_BlinkTimerCallback (TimerHandle_t xTimer) {
 #endif /* ENABLE_LED */
 
 #if defined(ENABLE_PWM_LED)
-static void LED_API_PulseTimerCallback (TimerHandle_t xTimer) {
-    sLedPulseDesc_t *led_pulse_desc = (sLedPulseDesc_t*) pvTimerGetTimerID(xTimer);
+static void LED_API_PulseTimerCallback(TimerHandle_t xTimer) {
+    sLedPulseDesc_t *led_pulse_desc = (sLedPulseDesc_t *) pvTimerGetTimerID(xTimer);
 
     if (NULL == led_pulse_desc) {
         return;
@@ -168,7 +168,7 @@ static void LED_API_PulseTimerCallback (TimerHandle_t xTimer) {
         xSemaphoreGiveRecursive(led_pulse_desc->pulse_mutex);
     }
 
-   PWM_Driver_ChangeDutyCycle(g_pwm_led_desc_lut[led_pulse_desc->led].pwm_device, led_pulse_desc->current_duty_cycle);
+    PWM_Driver_ChangeDutyCycle(g_pwm_led_desc_lut[led_pulse_desc->led].pwm_device, led_pulse_desc->current_duty_cycle);
 
     if (led_pulse_desc->pwm_change_count >= led_pulse_desc->pwm_changes_per_pulse) {
         if (led_pulse_desc->count_dir_up) {
@@ -196,7 +196,7 @@ static void LED_API_PulseTimerCallback (TimerHandle_t xTimer) {
         }
     }
 
-   led_pulse_desc->pwm_change_count++;
+    led_pulse_desc->pwm_change_count++;
 
     if (led_pulse_desc->pulse_count >= led_pulse_desc->total_pulses) {
         // TODO: redefine pdMS_TO_TICKS with guard 0/1, and compilation error if arg time is less than configTICK_RATE_HZ
@@ -209,7 +209,7 @@ static void LED_API_PulseTimerCallback (TimerHandle_t xTimer) {
         led_pulse_desc->pulse_count = 0;
     }
 
-   return;
+    return;
 }
 #endif /* ENABLE_PWM_LED */
 
@@ -217,28 +217,28 @@ static void LED_API_PulseTimerCallback (TimerHandle_t xTimer) {
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-bool LED_API_Init (void) {
-    #if defined(ENABLE_LED) && defined(ENABLE_PWM_LED)
+bool LED_API_Init(void) {
+#if defined(ENABLE_LED) && defined(ENABLE_PWM_LED)
     if (g_is_led_initialized && g_is_pwm_initialized) {
         return true;
     }
-    #elif defined(ENABLE_LED)
+#elif defined(ENABLE_LED)
     if (g_is_led_initialized) {
         return true;
     }
-    #elif defined(ENABLE_PWM_LED)
+#elif defined(ENABLE_PWM_LED)
     if (g_is_pwm_initialized) {
         return true;
     }
-    #endif /* ENABLE_LED && ENABLE_PWM_LED */
+#endif /* ENABLE_LED && ENABLE_PWM_LED */
 
     if (!GPIO_Driver_InitAllPins()) {
         TRACE_ERR("Init: Failed to initialize GPIO pins\n");
-        
+
         return false;
     }
 
-    #if defined(ENABLE_PWM_LED)
+#if defined(ENABLE_PWM_LED)
     if (!PWM_Driver_InitAllDevices()) {
         TRACE_ERR("Init: Failed to initialize PWM devices\n");
 
@@ -246,29 +246,29 @@ bool LED_API_Init (void) {
     }
 
     g_is_pwm_initialized = true;
-    #endif /* ENABLE_PWM_LED */
+#endif /* ENABLE_PWM_LED */
 
     g_is_led_initialized = true;
 
-    #if defined(ENABLE_LED)
+#if defined(ENABLE_LED)
     for (eLed_t led = eLed_First; led < eLed_Last; led++) {
         const sLedDesc_t *desc = LED_Config_GetLedDesc(led);
 
         if (NULL == desc) {
             TRACE_ERR("Init: Failed to get LED [%d] description\n", led);
-            
+
             g_is_led_initialized = false;
 
             return false;
         }
 
         g_led_desc_lut[led] = *desc;
-        
+
         g_led_blink_lut[led].blink_timer = xTimerCreateStatic(g_led_desc_lut[led].blink_timer_name, DEFAULT_BLINK_TIMER_TICKS, pdTRUE, &g_led_blink_lut[led], LED_API_BlinkTimerCallback, &g_led_blink_lut[led].blink_timer_buffer);
-        
+
         if (NULL == g_led_blink_lut[led].blink_timer) {
             TRACE_ERR("Init: Failed to create blink timer for LED [%d]\n", led);
-            
+
             g_is_led_initialized = false;
 
             return false;
@@ -278,7 +278,7 @@ bool LED_API_Init (void) {
 
         if (NULL == g_led_blink_lut[led].blink_mutex) {
             TRACE_ERR("Init: Failed to create blink mutex for LED [%d]\n", led);
-            
+
             g_is_led_initialized = false;
 
             return false;
@@ -286,15 +286,15 @@ bool LED_API_Init (void) {
 
         g_led_blink_lut[led].led = led;
     }
-    #endif /* ENABLE_LED */
+#endif /* ENABLE_LED */
 
-    #if defined(ENABLE_PWM_LED)
+#if defined(ENABLE_PWM_LED)
     for (eLedPwm_t led = eLedPwm_First; led < eLedPwm_Last; led++) {
         const sLedPwmDesc_t *desc = LED_Config_GetPwmLedDesc(led);
 
         if (NULL == desc) {
             TRACE_ERR("Init: Failed to get PWM LED [%d] description\n", led);
-            
+
             g_is_pwm_initialized = false;
 
             return false;
@@ -303,10 +303,10 @@ bool LED_API_Init (void) {
         g_pwm_led_desc_lut[led] = *desc;
 
         g_led_pulse_lut[led].pulse_timer = xTimerCreateStatic(g_pwm_led_desc_lut[led].pulse_timer_name, DEFAULT_PULSE_TIMER_TICKS, pdTRUE, &g_led_pulse_lut[led], LED_API_PulseTimerCallback, &g_led_pulse_lut[led].pulse_timer_buffer);
-        
+
         if (NULL == g_led_pulse_lut[led].pulse_timer) {
             TRACE_ERR("Init: Failed to create pulse timer for PWM LED [%d]\n", led);
-            
+
             g_is_pwm_initialized = false;
 
             return false;
@@ -316,7 +316,7 @@ bool LED_API_Init (void) {
 
         if (NULL == g_led_pulse_lut[led].pulse_mutex) {
             TRACE_ERR("Init: Failed to create pulse mutex for PWM LED [%d]\n", led);
-            
+
             g_is_pwm_initialized = false;
 
             return false;
@@ -324,97 +324,97 @@ bool LED_API_Init (void) {
 
         if (!PWM_Driver_EnableDevice(g_pwm_led_desc_lut[led].pwm_device)) {
             TRACE_ERR("Init: Failed to enable PWM device for LED [%d]\n", led);
-            
+
             g_is_pwm_initialized = false;
-            
+
             return false;
         }
 
         g_led_pulse_lut[led].led = led;
         g_led_pulse_lut[led].timer_resolution = PWM_Driver_GetDeviceTimerResolution(g_pwm_led_desc_lut[led].pwm_device);
     }
-    #endif /* ENABLE_PWM_LED */
+#endif /* ENABLE_PWM_LED */
 
     return true;
 }
 
 #if defined(ENABLE_LED)
-bool LED_API_TurnOn (const eLed_t led) {
+bool LED_API_TurnOn(const eLed_t led) {
     if (!g_is_led_initialized) {
         TRACE_ERR("TurnOn: LED not initialized\n");
-        
+
         return false;
     }
-    
+
     if (!LED_Config_IsCorrectLed(led)) {
         TRACE_ERR("TurnOn: Incorrect LED type [%d]\n", led);
-        
+
         return false;
     }
 
     return GPIO_Driver_WritePin(g_led_desc_lut[led].led_pin, !g_led_desc_lut[led].is_inverted);
 }
 
-bool LED_API_TurnOff (const eLed_t led) {
+bool LED_API_TurnOff(const eLed_t led) {
     if (!g_is_led_initialized) {
         TRACE_ERR("TurnOff: LED not initialized\n");
-        
+
         return false;
     }
-    
+
     if (!LED_Config_IsCorrectLed(led)) {
         TRACE_ERR("TurnOff: Incorrect LED type [%d]\n", led);
-        
+
         return false;
     }
-    
+
     return GPIO_Driver_WritePin(g_led_desc_lut[led].led_pin, g_led_desc_lut[led].is_inverted);
 }
 
-bool LED_API_Toggle (const eLed_t led) {
+bool LED_API_Toggle(const eLed_t led) {
     if (!g_is_led_initialized) {
         TRACE_ERR("Toggle: LED not initialized\n");
-        
+
         return false;
     }
-    
+
     if (!LED_Config_IsCorrectLed(led)) {
         TRACE_ERR("Toggle: Incorrect LED type [%d]\n", led);
-        
+
         return false;
     }
 
     return GPIO_Driver_TogglePin(g_led_desc_lut[led].led_pin);
 }
 
-bool LED_API_Blink (const eLed_t led, const size_t blink_time, const uint16_t blink_frequency) {
+bool LED_API_Blink(const eLed_t led, const size_t blink_time, const uint16_t blink_frequency) {
     if (!g_is_led_initialized) {
         TRACE_ERR("Blink: LED not initialized\n");
-        
+
         return false;
     }
 
     if (!LED_Config_IsCorrectLed(led)) {
         TRACE_ERR("Blink: Incorrect LED type [%d]\n", led);
-        
+
         return false;
     }
 
     if (!LED_API_IsCorrectBlinkTime(blink_time)) {
         TRACE_ERR("Blink: Incorrect blink time [%d]\n", blink_time);
-        
+
         return false;
     }
 
     if (!LED_API_IsCorrectBlinkFrequency(blink_frequency)) {
         TRACE_ERR("Blink: Incorrect blink frequency [%d]\n", blink_frequency);
-        
+
         return false;
     }
 
     if (g_led_blink_lut[led].is_running) {
         TRACE_WRN("Blink: LED [%d] is already blinking\n", led);
-        
+
         return false;
     }
 
@@ -422,7 +422,7 @@ bool LED_API_Blink (const eLed_t led, const size_t blink_time, const uint16_t bl
 
     if (pdTRUE != xSemaphoreTakeRecursive(g_led_blink_lut[led].blink_mutex, BLINK_MUTEX_TIMEOUT)) {
         TRACE_ERR("Blink: Failed to acquire blink mutex for LED [%d]\n", led);
-        
+
         return false;
     }
 
@@ -439,56 +439,56 @@ bool LED_API_Blink (const eLed_t led, const size_t blink_time, const uint16_t bl
 #endif /* ENABLE_LED */
 
 #if defined(ENABLE_PWM_LED)
-bool LED_API_Set_Brightness (const eLedPwm_t led, const uint16_t brightness) {
+bool LED_API_Set_Brightness(const eLedPwm_t led, const uint16_t brightness) {
     if (!g_is_pwm_initialized) {
         TRACE_ERR("Set_Brightness: PWM LED not initialized\n");
-        
+
         return false;
     }
 
     if (!LED_Config_IsCorrectPwmLed(led)) {
         TRACE_ERR("Set_Brightness: Incorrect PWM LED type [%d]\n", led);
-        
+
         return false;
     }
 
     if (!LED_API_IsCorrectDutyCycle(led, brightness)) {
         TRACE_ERR("Set_Brightness: Incorrect brightness [%d] for LED [%d]\n", brightness, led);
-        
+
         return false;
     }
 
     return PWM_Driver_ChangeDutyCycle(g_pwm_led_desc_lut[led].pwm_device, brightness);
 }
 
-bool LED_API_Pulse (const eLedPwm_t led, const size_t pulsing_time, const uint16_t pulse_frequency) {
+bool LED_API_Pulse(const eLedPwm_t led, const size_t pulsing_time, const uint16_t pulse_frequency) {
     if (!g_is_pwm_initialized) {
         TRACE_ERR("Pulse: PWM LED not initialized\n");
-        
+
         return false;
     }
 
     if (!LED_Config_IsCorrectPwmLed(led)) {
         TRACE_ERR("Pulse: Incorrect PWM LED type [%d]\n", led);
-        
+
         return false;
     }
 
     if (!LED_API_IsCorrectPulseTime(pulsing_time)) {
         TRACE_ERR("Pulse: Incorrect pulse time [%d]\n", pulsing_time);
-        
+
         return false;
     }
 
     if (!LED_API_IsCorrectPulseFrequency(pulse_frequency)) {
         TRACE_ERR("Pulse: Incorrect pulse frequency [%d]\n", pulse_frequency);
-        
+
         return false;
     }
 
     if (g_led_pulse_lut[led].is_running) {
         TRACE_WRN("Pulse: LED [%d] is already pulsing\n", led);
-        
+
         return false;
     }
 
@@ -496,7 +496,7 @@ bool LED_API_Pulse (const eLedPwm_t led, const size_t pulsing_time, const uint16
 
     if (pdTRUE != xSemaphoreTakeRecursive(g_led_pulse_lut[led].pulse_mutex, PULSE_MUTEX_TIMEOUT)) {
         TRACE_ERR("Pulse: Failed to acquire pulse mutex for LED [%d]\n", led);
-        
+
         return false;
     }
 
@@ -505,7 +505,7 @@ bool LED_API_Pulse (const eLedPwm_t led, const size_t pulsing_time, const uint16
 
     g_led_pulse_lut[led].pwm_changes_per_pulse = pulse_frequency / (2 * PULSE_TIMER_FREQUENCY);
     g_led_pulse_lut[led].duty_cycle_change = g_led_pulse_lut[led].timer_resolution / g_led_pulse_lut[led].pwm_changes_per_pulse;
-    
+
     g_led_pulse_lut[led].pwm_change_count = 0;
     g_led_pulse_lut[led].current_duty_cycle = g_led_pulse_lut[led].duty_cycle_change;
     g_led_pulse_lut[led].count_dir_up = true;
@@ -520,27 +520,26 @@ bool LED_API_Pulse (const eLedPwm_t led, const size_t pulsing_time, const uint16
 #endif /* ENABLE_PWM_LED */
 
 #if defined(ENABLE_LED)
-bool LED_API_IsCorrectBlinkTime (const size_t blink_time) {
+bool LED_API_IsCorrectBlinkTime(const size_t blink_time) {
     return (blink_time <= MAX_BLINK_TIME) && (blink_time > 0);
 }
 
-bool LED_API_IsCorrectBlinkFrequency (const uint16_t blink_frequency) {
+bool LED_API_IsCorrectBlinkFrequency(const uint16_t blink_frequency) {
     return (blink_frequency <= MAX_BLINK_FREQUENCY) && (blink_frequency >= MIN_BLINK_FREQUENCY);
 }
 #endif /* ENABLE_LED */
 
 #if defined(ENABLE_PWM_LED)
-bool LED_API_IsCorrectDutyCycle (const eLedPwm_t led, const uint16_t duty_cycle) {
+bool LED_API_IsCorrectDutyCycle(const eLedPwm_t led, const uint16_t duty_cycle) {
     return (duty_cycle >= 0) && (duty_cycle <= g_led_pulse_lut[led].timer_resolution);
 }
 
-bool LED_API_IsCorrectPulseTime (const size_t pulse_time) {
+bool LED_API_IsCorrectPulseTime(const size_t pulse_time) {
     return (pulse_time <= MAX_PULSING_TIME) && (pulse_time > 0);
 }
 
-bool LED_API_IsCorrectPulseFrequency (const uint16_t pulse_frequency) {
+bool LED_API_IsCorrectPulseFrequency(const uint16_t pulse_frequency) {
     return (pulse_frequency <= MAX_PULSE_FREQUENCY) && (pulse_frequency > MIN_PULSE_FREQUENCY);
 }
 #endif /* ENABLE_PWM_LED */
-
 #endif /* ENABLE_LED || ENABLE_PWM_LED */

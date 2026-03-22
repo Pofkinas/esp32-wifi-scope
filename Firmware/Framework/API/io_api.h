@@ -28,7 +28,7 @@ typedef enum ePressType {
     ePressType_Long = 0x2,
     ePressType_Last
 } ePressType_t;
- 
+
 typedef struct sIoEvent {
     eIo_t device;
     uint32_t pressed_tick;
@@ -43,10 +43,10 @@ typedef struct sIoEvent {
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool IO_API_Init (const eIo_t device, EventGroupHandle_t event_group);
-bool IO_API_Start (void);
-bool IO_API_Stop (void);
-bool IO_API_ReadPinState (const eIo_t device, bool *pin_state);
+bool IO_API_Init(const eIo_t device, EventGroupHandle_t event_group);
+bool IO_API_Start(void);
+bool IO_API_Stop(void);
+bool IO_API_ReadPinState(const eIo_t device, bool *pin_state);
 sIoEvent_t *IO_API_GetEventData(const eIo_t device);
 
 #endif /* ENABLE_IO */

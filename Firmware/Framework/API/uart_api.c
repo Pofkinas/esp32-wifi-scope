@@ -50,7 +50,7 @@ typedef struct sUartApiDynamic {
  *********************************************************************************************************************/
 
 #if defined(DEBUG_UART_API)
-CREATE_MODULE_NAME (UART_API)
+CREATE_MODULE_NAME(UART_API)
 #else
 CREATE_MODULE_NAME_EMPTY
 #endif /* DEBUG_UART_API */
@@ -74,39 +74,39 @@ static sUartDynamic_t g_dynamic_uart_lut[eUart_Last] = {0};
  * Prototypes of private functions
  *********************************************************************************************************************/
 
-static void UART_API_GetDataReceived (const eUart_t uart);
-static void UART_API_FsmThread (void *arg);
-static bool UART_API_IsDelimiterReceived (const eUart_t uart);
-static void UART_API_BufferIncrement (const eUart_t uart);
+static void UART_API_GetDataReceived(const eUart_t uart);
+static void UART_API_FsmThread(void *arg);
+static bool UART_API_IsDelimiterReceived(const eUart_t uart);
+static void UART_API_BufferIncrement(const eUart_t uart);
 
 /**********************************************************************************************************************
  * Definitions of private functions
  *********************************************************************************************************************/
 
-static void UART_API_GetDataReceived (const eUart_t uart) {
+static void UART_API_GetDataReceived(const eUart_t uart) {
     if (NULL == g_fsm_thread) {
         return;
     }
-    
+
     if (!UART_Config_IsCorrectUart(uart)) {
         return;
     }
 
-    #if defined(MCU_ESP32_S3)
+#if defined(MCU_ESP32_S3)
     xTaskNotifyGiveIndexed(g_fsm_thread, 0);
-    #endif /* MCU_ESP32_S3 */
-    #if defined(MCU_STM32FXX)
+#endif /* MCU_ESP32_S3 */
+#if defined(MCU_STM32FXX)
     vTaskNotifyGiveIndexedFromISR(g_fsm_thread, 0, NULL);
-    #endif /* MCU_STM32FXX */
+#endif /* MCU_STM32FXX */
 
     return;
 }
 
-// TODO: Separate uart polling and parsing into different files 
-static void UART_API_FsmThread (void *arg) {
+// TODO: Separate uart polling and parsing into different files
+static void UART_API_FsmThread(void *arg) {
     while (1) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        
+
         for (eUart_t uart = eUart_First; uart < eUart_Last; uart++) {
             if (eState_Uninitialized == g_dynamic_uart_lut[uart].current_state) {
                 continue;
@@ -115,13 +115,13 @@ static void UART_API_FsmThread (void *arg) {
             switch (g_dynamic_uart_lut[uart].current_state) {
                 case eState_Setup: {
                     g_dynamic_uart_lut[uart].message.data = Heap_API_Calloc(g_static_uart_lut[uart].buffer_capacity, sizeof(char));
-                    
+
                     if (NULL == g_dynamic_uart_lut[uart].message.data) {
                         TRACE_WRN("FsmThread: Failed to allocate buffer for UART [%d]\n", uart);
-                        
+
                         continue;
                     }
-                    
+
                     g_dynamic_uart_lut[uart].message.size = 0;
                     g_dynamic_uart_lut[uart].current_state = eState_Collect;
                     /* fall through */
@@ -154,13 +154,13 @@ static void UART_API_FsmThread (void *arg) {
                 case eState_Flush: {
                     if (pdTRUE != xQueueSend(g_dynamic_uart_lut[uart].message_queue, &g_dynamic_uart_lut[uart].message, UART_API_MESSAGE_QUEUE_PUT_TIMEOUT)) {
                         TRACE_ERR("FsmThread: Failed to put message in queue for UART [%d]\n", uart);
-                        
+
                         continue;
                     }
 
                     g_dynamic_uart_lut[uart].current_state = eState_Setup;
                 } break;
-                default: {  
+                default: {
                 } break;
             }
         }
@@ -169,7 +169,7 @@ static void UART_API_FsmThread (void *arg) {
     }
 }
 
-static void UART_API_BufferIncrement (const eUart_t uart) {
+static void UART_API_BufferIncrement(const eUart_t uart) {
     g_dynamic_uart_lut[uart].message.size++;
 
     if (g_dynamic_uart_lut[uart].message.size >= g_static_uart_lut[uart].buffer_capacity) {
@@ -179,15 +179,15 @@ static void UART_API_BufferIncrement (const eUart_t uart) {
     return;
 }
 
-static bool UART_API_IsDelimiterReceived (const eUart_t uart) {
+static bool UART_API_IsDelimiterReceived(const eUart_t uart) {
     if (g_dynamic_uart_lut[uart].message.size < g_dynamic_uart_lut[uart].delimiter_length) {
         return false;
     }
-    
+
     if (g_dynamic_uart_lut[uart].delimiter[g_dynamic_uart_lut[uart].delimiter_length - 1] != g_dynamic_uart_lut[uart].message.data[g_dynamic_uart_lut[uart].message.size - 1]) {
         return false;
-    } 
-    
+    }
+
     size_t start_pos = g_dynamic_uart_lut[uart].message.size - g_dynamic_uart_lut[uart].delimiter_length;
 
     return (0 == memcmp(&g_dynamic_uart_lut[uart].message.data[start_pos], g_dynamic_uart_lut[uart].delimiter, g_dynamic_uart_lut[uart].delimiter_length));
@@ -197,7 +197,7 @@ static bool UART_API_IsDelimiterReceived (const eUart_t uart) {
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-bool UART_API_Init (const eUart_t uart, const eBaudrate_t baudrate, const char *delimiter) {
+bool UART_API_Init(const eUart_t uart, const eBaudrate_t baudrate, const char *delimiter) {
     if (!UART_Config_IsCorrectUart(uart)) {
         return false;
     }
@@ -225,18 +225,18 @@ bool UART_API_Init (const eUart_t uart, const eBaudrate_t baudrate, const char *
     }
 
     g_static_uart_lut[uart] = *api_const;
-    
+
     if (!UART_Driver_Init(uart, baudrate, UART_API_GetDataReceived)) {
         return false;
     }
 
     g_dynamic_uart_lut[uart].mutex = xSemaphoreCreateRecursiveMutexStatic(&g_dynamic_uart_lut[uart].mutex_buffer);
-    
+
     if (NULL == g_dynamic_uart_lut[uart].mutex) {
         return false;
     }
 
-    g_dynamic_uart_lut[uart].message_queue = xQueueCreateStatic(UART_API_MESSAGE_QUEUE_CAPACITY, sizeof(sMessage_t), (uint8_t*)&g_dynamic_uart_lut[uart].message_queue_storage[0], &g_dynamic_uart_lut[uart].message_queue_buffer);
+    g_dynamic_uart_lut[uart].message_queue = xQueueCreateStatic(UART_API_MESSAGE_QUEUE_CAPACITY, sizeof(sMessage_t), (uint8_t *) &g_dynamic_uart_lut[uart].message_queue_storage[0], &g_dynamic_uart_lut[uart].message_queue_buffer);
 
     if (NULL == g_dynamic_uart_lut[uart].message_queue) {
         return false;
@@ -265,7 +265,7 @@ bool UART_API_Init (const eUart_t uart, const eBaudrate_t baudrate, const char *
 }
 
 // TODO: Revork UART_API_Send to use asynchronous sending with message queues and FSM thread + mutiple messages in buffer
-bool UART_API_Send (const eUart_t uart, const sMessage_t message, const uint32_t timeout) {
+bool UART_API_Send(const eUart_t uart, const sMessage_t message, const uint32_t timeout) {
     if (!UART_Config_IsCorrectUart(uart)) {
         return false;
     }
@@ -273,14 +273,14 @@ bool UART_API_Send (const eUart_t uart, const sMessage_t message, const uint32_t
     if (eState_Uninitialized == g_dynamic_uart_lut[uart].current_state) {
         return false;
     }
-    
+
     if (pdTRUE != xSemaphoreTakeRecursive(g_dynamic_uart_lut[uart].mutex, timeout)) {
         return false;
     }
 
-    if (!UART_Driver_Send(uart, (uint8_t*) message.data, message.size)) {  
+    if (!UART_Driver_Send(uart, (uint8_t *) message.data, message.size)) {
         xSemaphoreGiveRecursive(g_dynamic_uart_lut[uart].mutex);
-        
+
         return false;
     }
 
@@ -289,28 +289,28 @@ bool UART_API_Send (const eUart_t uart, const sMessage_t message, const uint32_t
     return true;
 }
 
-bool UART_API_Receive (const eUart_t uart, sMessage_t *message, const uint32_t timeout) {
+bool UART_API_Receive(const eUart_t uart, sMessage_t *message, const uint32_t timeout) {
     if (!UART_Config_IsCorrectUart(uart)) {
         TRACE_ERR("Receive: Incorrect UART type [%d]\n", uart);
-        
+
         return false;
     }
 
     if (eState_Uninitialized == g_dynamic_uart_lut[uart].current_state) {
         TRACE_ERR("Receive: UART [%d] not initialized\n", uart);
-        
+
         return false;
     }
 
     if (NULL == message) {
         TRACE_ERR("Receive: Message pointer is NULL for UART [%d]\n", uart);
-        
+
         return false;
     }
 
     if (pdTRUE != xQueueReceive(g_dynamic_uart_lut[uart].message_queue, message, timeout)) {
         TRACE_ERR("Receive: Failed to get message from queue for UART [%d]\n", uart);
-        
+
         return false;
     }
 

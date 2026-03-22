@@ -34,7 +34,7 @@ typedef struct sCmdDesc {
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-eErrorCode_t CMD_API_FindCommand (sMessage_t command, sMessage_t *response, sCmdDesc_t *command_lut, const size_t command_lut_size);
+eErrorCode_t CMD_API_FindCommand(sMessage_t command, sMessage_t *response, sCmdDesc_t *command_lut, const size_t command_lut_size);
 
 #endif /* ENABLE_CMD */
 #endif /* SOURCE_API_CMD_API_H_ */

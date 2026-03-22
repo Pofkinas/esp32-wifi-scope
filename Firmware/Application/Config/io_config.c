@@ -46,11 +46,13 @@ static const sIoDesc_t g_static_io_desc_lut[eIo_Last] = {
  * Exported variables and references
  *********************************************************************************************************************/
 
+/* clang-format off */ 
 const sTaskDesc_t g_io_thread_attributes = {
     .name = "IO_API_Poll",
     .stack_size = IO_THREAD_STACK_SIZE,
     .priority = eTaskPriority_Normal
 };
+/* clang-format on */
 
 /**********************************************************************************************************************
  * Prototypes of private functions
@@ -64,11 +66,11 @@ const sTaskDesc_t g_io_thread_attributes = {
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-bool IO_Config_IsCorrectIo (const eIo_t io_device) {
+bool IO_Config_IsCorrectIo(const eIo_t io_device) {
     return (io_device >= eIo_First) && (io_device < eIo_Last);
 }
 
-const sExtiDesc_t *IO_Config_GetExtiDesc (const eIo_t io_device) {
+const sExtiDesc_t *IO_Config_GetExtiDesc(const eIo_t io_device) {
     if (!IO_Config_IsCorrectIo(io_device)) {
         return NULL;
     }
@@ -76,7 +78,7 @@ const sExtiDesc_t *IO_Config_GetExtiDesc (const eIo_t io_device) {
     return &g_static_exti_lut[io_device];
 }
 
-const sIoDesc_t *IO_Config_GetIoDesc (const eIo_t io_device) {
+const sIoDesc_t *IO_Config_GetIoDesc(const eIo_t io_device) {
     if (!IO_Config_IsCorrectIo(io_device)) {
         return NULL;
     }

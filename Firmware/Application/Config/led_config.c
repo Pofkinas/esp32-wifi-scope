@@ -45,11 +45,13 @@ static const sLedPwmDesc_t g_pwm_led_static_lut[eLedPwm_Last] = {
  * Exported variables and references
  *********************************************************************************************************************/
 
+/* clang-format off */
 const sTaskDesc_t g_led_thread_attributes = {
     .name = "LED_APP",
     .stack_size = LED_THREAD_STACK_SIZE,
     .priority = eTaskPriority_Normal
 };
+/* clang-format on */
 
 /**********************************************************************************************************************
  * Prototypes of private functions
@@ -64,11 +66,11 @@ const sTaskDesc_t g_led_thread_attributes = {
  *********************************************************************************************************************/
 
 #if defined(ENABLE_LED)
-bool LED_Config_IsCorrectLed (const eLed_t led) {
+bool LED_Config_IsCorrectLed(const eLed_t led) {
     return (led >= eLed_First) && (led < eLed_Last);
 }
 
-const sLedDesc_t *LED_Config_GetLedDesc (const eLed_t led) {
+const sLedDesc_t *LED_Config_GetLedDesc(const eLed_t led) {
     if (!LED_Config_IsCorrectLed(led)) {
         return NULL;
     }
@@ -78,11 +80,11 @@ const sLedDesc_t *LED_Config_GetLedDesc (const eLed_t led) {
 #endif /* ENABLE_LED */
 
 #if defined(ENABLE_PWM_LED)
-bool LED_Config_IsCorrectPwmLed (const eLedPwm_t led) {
+bool LED_Config_IsCorrectPwmLed(const eLedPwm_t led) {
     return (led >= eLedPwm_First) && (led < eLedPwm_Last);
 }
 
-const sLedPwmDesc_t *LED_Config_GetPwmLedDesc (const eLedPwm_t led) {
+const sLedPwmDesc_t *LED_Config_GetPwmLedDesc(const eLedPwm_t led) {
     if (!LED_Config_IsCorrectPwmLed(led)) {
         return NULL;
     }

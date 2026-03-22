@@ -41,7 +41,7 @@ typedef struct sGpioDesc {
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool GPIO_Config_IsCorrectGpio (const eGpio_t gpio);
-const sGpioDesc_t *GPIO_Config_GetGpioDesc (const eGpio_t gpio_pin);
+bool GPIO_Config_IsCorrectGpio(const eGpio_t gpio);
+const sGpioDesc_t *GPIO_Config_GetGpioDesc(const eGpio_t gpio_pin);
 
 #endif /* APPLICATION_CONFIG_GPIO_CONFIG_H_ */

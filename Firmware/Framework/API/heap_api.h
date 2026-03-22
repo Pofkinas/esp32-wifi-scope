@@ -29,8 +29,8 @@
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool Heap_API_Init (void);
-void *Heap_API_MemoryAllocate (const size_t number_of_elements, const size_t size);
-bool Heap_API_Free (void *pointer_to_memory);
+bool Heap_API_Init(void);
+void *Heap_API_MemoryAllocate(const size_t number_of_elements, const size_t size);
+bool Heap_API_Free(void *pointer_to_memory);
 
 #endif /* SOURCE_API_HEAP_API_H_ */

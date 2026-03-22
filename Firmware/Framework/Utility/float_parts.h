@@ -20,8 +20,8 @@
 
 #define POW10(n) POW10_##n
 
-#define FLOAT_INTEGER_PART(float_value) ((int32_t)(float_value))
-#define FLOAT_FRACTIONAL_PART(float_value, precision) (labs(((int32_t)((float_value) * POW10(precision))) % POW10(precision)))
+#define FLOAT_INTEGER_PART(float_value) ((int32_t) (float_value))
+#define FLOAT_FRACTIONAL_PART(float_value, precision) (labs(((int32_t) ((float_value) * POW10(precision))) % POW10(precision)))
 
 /**********************************************************************************************************************
  * Exported types

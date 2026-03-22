@@ -26,11 +26,11 @@
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool GPIO_Driver_InitAllPins (void);
-bool GPIO_Driver_WritePin (const eGpio_t gpio_pin, const bool pin_state);
-bool GPIO_Driver_ReadPin (const eGpio_t gpio_pin, bool *pin_state);
-bool GPIO_Driver_TogglePin (const eGpio_t gpio_pin);
-bool GPIO_Driver_ResetPin (const eGpio_t gpio_pin);
+bool GPIO_Driver_InitAllPins(void);
+bool GPIO_Driver_WritePin(const eGpio_t gpio_pin, const bool pin_state);
+bool GPIO_Driver_ReadPin(const eGpio_t gpio_pin, bool *pin_state);
+bool GPIO_Driver_TogglePin(const eGpio_t gpio_pin);
+bool GPIO_Driver_ResetPin(const eGpio_t gpio_pin);
 
 #endif /* ENABLE_GPIO */
 #endif /* SOURCE_DRIVER_GPIO_DRIVER_H_ */

@@ -21,7 +21,7 @@
  *********************************************************************************************************************/
 
 #define DEFAULT_TIMER_TICKS 1U
- 
+
 #define MUTEX_TIMEOUT 0U
 #define TIMER_TIMEOUT 0U
 
@@ -65,16 +65,18 @@ typedef struct sIoDynamic {
  *********************************************************************************************************************/
 
 #if defined(DEBUG_IO_API)
-CREATE_MODULE_NAME (IO_API)
+CREATE_MODULE_NAME(IO_API)
 #else
 CREATE_MODULE_NAME_EMPTY
 #endif /* DEBUG_IO_API */
 
+/* clang-format off */
 static const eExtiTrigger_t g_press_trigger_lut[eActiveState_Last] = {
     [eActiveState_Low] = eExtiTrigger_Falling,
     [eActiveState_High] = eExtiTrigger_Rising,
     [eActiveState_Both] = eExtiTrigger_RisingFalling
 };
+/* clang-format on */
 
 /**********************************************************************************************************************
  * Private variables
@@ -97,29 +99,29 @@ static sIoDynamic_t g_dynamic_io_lut[eIo_Last] = {0};
  * Prototypes of private functions
  *********************************************************************************************************************/
 
-static void IO_API_PollThread (void *pvParameters);
-static void IO_API_ExtiTriggered (void *context);
-static bool IO_API_StartDebounceTimer (const eIo_t device, const bool is_from_isr);
-static void IO_API_DebounceTimerCallback (TimerHandle_t xTimer);
-static bool IO_API_IsGpioStateCorrect (const eIo_t device, const sIoDynamic_t *device_data);
-static bool IO_API_IsGpioTriggered (const bool io_state, const eExtiTrigger_t trigger_state);
-static uint32_t IO_API_GetDetectedPressType (const eIo_t device, const sIoDynamic_t *device_data);
-static void IO_API_NotifyNonDebounce (const eIo_t device, sIoDynamic_t *const device_data, const bool is_from_isr);
-static bool IO_API_ConfigureTriggers (const eActiveState_t active_state, sIoDynamic_t *device);
+static void IO_API_PollThread(void *pvParameters);
+static void IO_API_ExtiTriggered(void *context);
+static bool IO_API_StartDebounceTimer(const eIo_t device, const bool is_from_isr);
+static void IO_API_DebounceTimerCallback(TimerHandle_t xTimer);
+static bool IO_API_IsGpioStateCorrect(const eIo_t device, const sIoDynamic_t *device_data);
+static bool IO_API_IsGpioTriggered(const bool io_state, const eExtiTrigger_t trigger_state);
+static uint32_t IO_API_GetDetectedPressType(const eIo_t device, const sIoDynamic_t *device_data);
+static void IO_API_NotifyNonDebounce(const eIo_t device, sIoDynamic_t *const device_data, const bool is_from_isr);
+static bool IO_API_ConfigureTriggers(const eActiveState_t active_state, sIoDynamic_t *device);
 
 /**********************************************************************************************************************
  * Definitions of private functions
  *********************************************************************************************************************/
 
-static void IO_API_PollThread (void *pvParameters) {
+static void IO_API_PollThread(void *pvParameters) {
     eIo_t device;
-    
+
     while (1) {
         for (device = eIo_First; device < eIo_Last; device++) {
             if (g_static_io_desc_lut[device].is_exti) {
                 continue;
             }
-            
+
             if (g_static_io_desc_lut[device].is_debounce_enable) {
                 if ((eIoDeviceState_DebouncePress == g_dynamic_io_lut[device].state) || (eIoDeviceState_DebounceRelease == g_dynamic_io_lut[device].state)) {
                     continue;
@@ -153,15 +155,15 @@ static void IO_API_PollThread (void *pvParameters) {
 }
 
 #if defined(MCU_ESP32_S3)
-static void IRAM_ATTR IO_API_ExtiTriggered (void *context) {
+static void IRAM_ATTR IO_API_ExtiTriggered(void *context) {
 #else
-static void IO_API_ExtiTriggered (void *context) {
+static void IO_API_ExtiTriggered(void *context) {
 #endif /* MCU_ESP32_S3 */
     if (eIoState_Started != g_io_state) {
         return;
     }
-    
-    sIoDynamic_t *device = (sIoDynamic_t*) context;
+
+    sIoDynamic_t *device = (sIoDynamic_t *) context;
 
     if (NULL == device) {
         return;
@@ -191,7 +193,7 @@ static void IO_API_ExtiTriggered (void *context) {
     return;
 }
 
-static bool IO_API_StartDebounceTimer (const eIo_t device, const bool is_from_isr) {
+static bool IO_API_StartDebounceTimer(const eIo_t device, const bool is_from_isr) {
     if (!IO_Config_IsCorrectIo(device)) {
         return false;
     }
@@ -204,7 +206,7 @@ static bool IO_API_StartDebounceTimer (const eIo_t device, const bool is_from_is
 
     if (is_from_isr) {
         // TODO: redefine pdMS_TO_TICKS with guard 0/1, and compilation error if arg time is less than configTICK_RATE_HZ
-        
+
         g_dynamic_io_lut[device].state = next_state;
         return (pdTRUE == xTimerChangePeriodFromISR(g_dynamic_io_lut[device].debounce_timer, pdMS_TO_TICKS(g_static_io_desc_lut[device].debounce_period_ms), NULL));
     }
@@ -221,12 +223,12 @@ static bool IO_API_StartDebounceTimer (const eIo_t device, const bool is_from_is
     return (pdTRUE == xTimerChangePeriod(g_dynamic_io_lut[device].debounce_timer, pdMS_TO_TICKS(g_static_io_desc_lut[device].debounce_period_ms), TIMER_TIMEOUT));
 }
 
-static void IO_API_DebounceTimerCallback (TimerHandle_t xTimer) {
+static void IO_API_DebounceTimerCallback(TimerHandle_t xTimer) {
     if (eIoState_Started != g_io_state) {
         return;
     }
 
-    sIoDynamic_t *debounce_io = (sIoDynamic_t*) pvTimerGetTimerID(xTimer);
+    sIoDynamic_t *debounce_io = (sIoDynamic_t *) pvTimerGetTimerID(xTimer);
 
     if (NULL == debounce_io) {
         return;
@@ -236,13 +238,13 @@ static void IO_API_DebounceTimerCallback (TimerHandle_t xTimer) {
 
     if ((eIoDeviceState_DebouncePress != debounce_io->state) && (eIoDeviceState_DebounceRelease != debounce_io->state)) {
         TRACE_WRN("Debounce: exit early, state [%d]\n", debounce_io->state);
-        
+
         return;
     }
 
     if (!IO_API_IsGpioStateCorrect(debounce_io->device, debounce_io)) {
         TRACE_WRN("Debounce: GPIO state is incorrect [%d]\n", debounce_io->device);
-        
+
         debounce_status = false;
     }
 
@@ -298,10 +300,10 @@ static void IO_API_DebounceTimerCallback (TimerHandle_t xTimer) {
     if (is_mutex_taken) {
         xSemaphoreGiveRecursive(debounce_io->mutex);
     }
-    
-    if (!debounce_status) {  
+
+    if (!debounce_status) {
         TRACE_WRN("Debounce: IO [%d] debounce failed\n", debounce_io->device);
-        
+
         return;
     }
 
@@ -314,7 +316,7 @@ static void IO_API_DebounceTimerCallback (TimerHandle_t xTimer) {
     return;
 }
 
-static bool IO_API_IsGpioStateCorrect (const eIo_t device, const sIoDynamic_t *device_data) {
+static bool IO_API_IsGpioStateCorrect(const eIo_t device, const sIoDynamic_t *device_data) {
     if (!IO_Config_IsCorrectIo(device)) {
         return false;
     }
@@ -324,7 +326,7 @@ static bool IO_API_IsGpioStateCorrect (const eIo_t device, const sIoDynamic_t *d
     }
 
     bool io_state = false;
-    eExtiTrigger_t trigger_state = eExtiTrigger_First; 
+    eExtiTrigger_t trigger_state = eExtiTrigger_First;
 
     if (!GPIO_Driver_ReadPin(g_static_io_desc_lut[device].gpio_pin, &io_state)) {
         return false;
@@ -348,9 +350,9 @@ static bool IO_API_IsGpioStateCorrect (const eIo_t device, const sIoDynamic_t *d
     return IO_API_IsGpioTriggered(io_state, trigger_state);
 }
 
-static bool IO_API_IsGpioTriggered (const bool io_state, const eExtiTrigger_t trigger_state) {
+static bool IO_API_IsGpioTriggered(const bool io_state, const eExtiTrigger_t trigger_state) {
     bool is_triggered = false;
-    
+
     switch (trigger_state) {
         case eExtiTrigger_Rising: {
             is_triggered = io_state;
@@ -369,7 +371,7 @@ static bool IO_API_IsGpioTriggered (const bool io_state, const eExtiTrigger_t tr
     return is_triggered;
 }
 
-static uint32_t IO_API_GetDetectedPressType (const eIo_t device, const sIoDynamic_t *device_data) {
+static uint32_t IO_API_GetDetectedPressType(const eIo_t device, const sIoDynamic_t *device_data) {
     uint32_t press_type = 0;
 
     if (!IO_Config_IsCorrectIo(device)) {
@@ -388,7 +390,7 @@ static uint32_t IO_API_GetDetectedPressType (const eIo_t device, const sIoDynami
     return press_type;
 }
 
-static void IO_API_NotifyNonDebounce (const eIo_t device, sIoDynamic_t *const device_data, const bool is_from_isr) {
+static void IO_API_NotifyNonDebounce(const eIo_t device, sIoDynamic_t *const device_data, const bool is_from_isr) {
     if (!IO_Config_IsCorrectIo(device)) {
         return;
     }
@@ -413,7 +415,7 @@ static void IO_API_NotifyNonDebounce (const eIo_t device, sIoDynamic_t *const de
     return;
 }
 
-static bool IO_API_ConfigureTriggers (const eActiveState_t active_state, sIoDynamic_t *const device) {
+static bool IO_API_ConfigureTriggers(const eActiveState_t active_state, sIoDynamic_t *const device) {
     if (device == NULL) {
         return false;
     }
@@ -442,7 +444,7 @@ static bool IO_API_ConfigureTriggers (const eActiveState_t active_state, sIoDyna
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-bool IO_API_Init (const eIo_t device, EventGroupHandle_t event_group) {
+bool IO_API_Init(const eIo_t device, EventGroupHandle_t event_group) {
     if (!IO_Config_IsCorrectIo(device)) {
         return false;
     }
@@ -493,7 +495,7 @@ bool IO_API_Init (const eIo_t device, EventGroupHandle_t event_group) {
 
     if (NULL == g_dynamic_io_lut[device].mutex) {
         g_dynamic_io_lut[device].mutex = xSemaphoreCreateRecursiveMutexStatic(&g_dynamic_io_lut[device].mutex_buffer);
-    
+
         if (NULL == g_dynamic_io_lut[device].mutex) {
             return false;
         }
@@ -511,7 +513,7 @@ bool IO_API_Init (const eIo_t device, EventGroupHandle_t event_group) {
     return true;
 }
 
-bool IO_API_Start (void) {
+bool IO_API_Start(void) {
     if (eIoState_Default == g_io_state) {
         return false;
     }
@@ -543,7 +545,7 @@ bool IO_API_Start (void) {
     return true;
 }
 
-bool IO_API_Stop (void) {
+bool IO_API_Stop(void) {
     if (eIoState_Default == g_io_state) {
         return false;
     } else if (eIoState_Init == g_io_state) {
@@ -568,7 +570,7 @@ bool IO_API_Stop (void) {
     return true;
 }
 
-bool IO_API_ReadPinState (const eIo_t device, bool *pin_state) {
+bool IO_API_ReadPinState(const eIo_t device, bool *pin_state) {
     if (!IO_Config_IsCorrectIo(device)) {
         return false;
     }
