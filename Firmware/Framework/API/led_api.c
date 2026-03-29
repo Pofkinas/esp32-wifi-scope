@@ -426,7 +426,7 @@ bool LED_API_Blink(const eLed_t led, const size_t blink_time, const uint16_t bli
         return false;
     }
 
-    g_led_blink_lut[led].total_blinks = blink_time * blink_frequency;
+    g_led_blink_lut[led].total_blinks = (blink_time * 1000 / blink_frequency) * 2;
     g_led_blink_lut[led].blink_count = 0;
 
     // TODO: redefine pdMS_TO_TICKS with guard 0/1, and compilation error if arg time is less than configTICK_RATE_HZ

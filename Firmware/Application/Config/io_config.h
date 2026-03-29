@@ -20,10 +20,10 @@
  * Exported definitions and macros
  *********************************************************************************************************************/
 
-#define IO_API_POLL_PERIOD_MS 50U
+#define IO_API_POLL_PERIOD_MS 5U
 
 #define BUTTON_TRIGGERED_EVENT 0x01U
-#define BUTTON_DEBOUNCE_MS 10U
+#define BUTTON_DEBOUNCE_MS 1U
 
 /**********************************************************************************************************************
  * Exported types

@@ -127,7 +127,7 @@ bool Debug_API_Print(const eTraceLevel_t trace_level, const char *file_trace, co
     message_length += (size_t) written;
 
     debug_message.size = message_length;
-    bool is_sent = UART_API_Send(DEBUG_UART, debug_message, DEBUG_MESSAGE_TIMEOUT);
+    bool is_sent = UART_API_Send(DEBUG_UART, debug_message, pdMS_TO_TICKS(DEBUG_MESSAGE_TIMEOUT));
 
     xSemaphoreGiveRecursive(g_debug_api_mutex);
 
