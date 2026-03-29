@@ -91,7 +91,7 @@
 
 #if defined(ENABLE_UART)
 #define UART0 eUart_Debug
-#define UART_0_BAUDRATE eBaudrate_115200
+#define UART_0_BAUDRATE eBaudrate_1000000
 
 #define UART_API_MESSAGE_QUEUE_CAPACITY 10
 #define UART_API_MESSAGE_QUEUE_PUT_TIMEOUT 0U
