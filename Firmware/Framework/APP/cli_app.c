@@ -16,7 +16,7 @@
 #include "error_messages.h"
 
 #include "freertos/FreeRTOS.h"
-#include "freertos_typedefs.h"
+#include "freertos_types.h"
 
 #if defined(ENABLE_CUSTOM_CMD)
 #include "custom_cli_lut.h"

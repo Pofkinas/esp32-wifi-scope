@@ -14,7 +14,7 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
-#include "freertos_typedefs.h"
+#include "freertos_types.h"
 
 /**********************************************************************************************************************
  * Private definitions and macros

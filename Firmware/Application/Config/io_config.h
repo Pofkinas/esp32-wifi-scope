@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "gpio_config.h"
-#include "freertos_typedefs.h"
+#include "freertos_types.h"
 
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"

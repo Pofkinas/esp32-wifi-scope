@@ -11,7 +11,7 @@
 #include "led_app.h"
 #include "debug_api.h"
 
-#include "freertos_typedefs.h"
+#include "freertos_types.h"
 #include "message.h"
 #include "io_api.h"
 

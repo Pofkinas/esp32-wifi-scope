@@ -11,7 +11,7 @@
 #include <stddef.h>
 #include "baudrate.h"
 #include "gpio_config.h"
-#include "freertos_typedefs.h"
+#include "freertos_types.h"
 
 #include "driver/uart.h"
 #include "freertos/FreeRTOS.h"

@@ -13,7 +13,7 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
-#include "freertos_typedefs.h"
+#include "freertos_types.h"
 
 /**********************************************************************************************************************
  * Private definitions and macros

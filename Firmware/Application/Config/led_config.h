@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "freertos_typedefs.h"
+#include "freertos_types.h"
 
 #if defined(ENABLE_LED)
 #include "gpio_config.h"
