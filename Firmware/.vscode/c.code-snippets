@@ -1,4 +1,88 @@
 {
+    "typedef struct": {
+        "scope": "c,cpp",
+        "prefix": "tstruct",
+        "description": "typedef struct with s-prefix and _t suffix",
+        "body": [
+            "typedef struct s${1:Name} {",
+            "    $0",
+            "} s${1:Name}_t;"
+        ]
+    },
+
+    "typedef enum": {
+        "scope": "c,cpp",
+        "prefix": "tenum",
+        "description": "typedef enum with e-prefix, First/Last elements and _t suffix",
+        "body": [
+            "typedef enum e${1:Name} {",
+            "    e${1:Name}_First = 0,",
+            "    e${1:Name}_${2:Value} = e${1:Name}_First,",
+            "    e${1:Name}_Last",
+            "} e${1:Name}_t;"
+        ]
+    },
+
+    "switch": {
+        "scope": "c,cpp",
+        "prefix": "switch",
+        "description": "switch statement with brace-per-case style",
+        "body": [
+            "switch (${1:var}) {",
+            "    case ${2:value}: {",
+            "        $0",
+            "    } break;",
+            "    default: {",
+            "        $0",
+            "    } break;",
+            "}"
+        ]
+    },
+
+    "case": {
+        "scope": "c,cpp",
+        "prefix": "case",
+        "description": "single case block",
+        "body": [
+            "case ${1:value}: {",
+            "    $0",
+            "} break;"
+        ]
+    },
+
+    "do/while": {
+        "scope": "c,cpp",
+        "prefix": "do",
+        "description": "do/while loop",
+        "body": [
+            "do {",
+            "    $0",
+            "} while (${1:condition});"
+        ]
+    },
+
+    "static const LUT": {
+        "scope": "c,cpp",
+        "prefix": "slut",
+        "description": "static const designated-initializer lookup table",
+        "body": [
+            "static const s${1:Type}_t g_${2:name}_lut[e${3:Enum}_Last] = {",
+            "    [e${3:Enum}_${4:Entry}] = {",
+            "        .${5:field} = ${6:value},",
+            "    },",
+            "};"
+        ]
+    },
+
+    "typedef callback": {
+        "scope": "c,cpp",
+        "prefix": "callback",
+        "description": "typedef function pointer callback with _t suffix",
+        "body": [
+            "typedef ${1:void} (*${2:name}_t)(${3:void});"
+        ]
+    },
+
     "C Header Template": {
         "scope": "c,cpp",
         "prefix": "htemplate",
@@ -30,10 +114,11 @@
             "$0"
         ]
     },
+
     "C Header Template (4-level path)": {
         "scope": "c,cpp",
         "prefix": "htemplate4",
-        "description": "C header file template for 4-level paths (e.g. Framework/Utility/Measure/file.h)",
+        "description": "C header file template for 4-level paths",
         "body": [
             "#ifndef ${RELATIVE_FILEPATH/^([^\\\\]+)[\\\\]([^\\\\]+)[\\\\]([^\\\\]+)[\\\\]([^.\\\\]+)\\.[^.]+$/${1:/upcase}_${2:/upcase}_${3:/upcase}_${4:/upcase}/}_H",
             "#define ${RELATIVE_FILEPATH/^([^\\\\]+)[\\\\]([^\\\\]+)[\\\\]([^\\\\]+)[\\\\]([^.\\\\]+)\\.[^.]+$/${1:/upcase}_${2:/upcase}_${3:/upcase}_${4:/upcase}/}_H",
@@ -61,6 +146,7 @@
             "$0"
         ]
     },
+
     "C Source Template": {
         "scope": "c,cpp",
         "prefix": "ctemplate",
