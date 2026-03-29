@@ -44,7 +44,7 @@ CREATE_MODULE_NAME_EMPTY
 static const sTaskDesc_t g_cli_thread_attributes = {
     .name = "CLI_APP",
     .stack_size = CLI_APP_THREAD_STACK_SIZE,
-    .priority = eTaskPriority_Normal
+    .priority = CLI_APP_THREAD_PRIORITY
 };
 /* clang-format on */
 

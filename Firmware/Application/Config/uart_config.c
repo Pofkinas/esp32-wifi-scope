@@ -58,7 +58,7 @@ static const sUartApiConst_t g_static_uart_api_lut[eUart_Last] = {
 const sTaskDesc_t g_fsm_thread_attributes = {
     .name = "UART_API",
     .stack_size = UART_API_THREAD_STACK_SIZE,
-    .priority = eTaskPriority_Normal
+    .priority = UART_API_THREAD_PRIORITY
 };
 /* clang-format on */
 

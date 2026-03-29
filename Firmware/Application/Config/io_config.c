@@ -49,8 +49,8 @@ static const sIoDesc_t g_static_io_desc_lut[eIo_Last] = {
 /* clang-format off */ 
 const sTaskDesc_t g_io_thread_attributes = {
     .name = "IO_API_Poll",
-    .stack_size = IO_THREAD_STACK_SIZE,
-    .priority = eTaskPriority_Normal
+    .stack_size = IO_API_THREAD_STACK_SIZE,
+    .priority = IO_API_THREAD_PRIORITY
 };
 /* clang-format on */
 

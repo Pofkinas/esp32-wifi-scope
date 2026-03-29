@@ -48,8 +48,8 @@ static const sLedPwmDesc_t g_pwm_led_static_lut[eLedPwm_Last] = {
 /* clang-format off */
 const sTaskDesc_t g_led_thread_attributes = {
     .name = "LED_APP",
-    .stack_size = LED_THREAD_STACK_SIZE,
-    .priority = eTaskPriority_Normal
+    .stack_size = LED_APP_THREAD_STACK_SIZE,
+    .priority = LED_APP_THREAD_PRIORITY
 };
 /* clang-format on */
 

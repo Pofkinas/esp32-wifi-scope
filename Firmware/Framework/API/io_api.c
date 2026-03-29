@@ -83,7 +83,7 @@ static const eExtiTrigger_t g_press_trigger_lut[eActiveState_Last] = {
  *********************************************************************************************************************/
 
 static TaskHandle_t g_io_thread = NULL;
-static StackType_t g_io_thread_stack[STACK_SIZE_IN_BYTES(IO_THREAD_STACK_SIZE)] = {0};
+static StackType_t g_io_thread_stack[STACK_SIZE_IN_BYTES(IO_API_THREAD_STACK_SIZE)] = {0};
 static StaticTask_t g_io_thread_buffer = {0};
 
 static eIoState_t g_io_state = eIoState_Default;

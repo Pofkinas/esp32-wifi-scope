@@ -23,8 +23,6 @@
  * Private typedef
  *********************************************************************************************************************/
 
-#define MAIN_TEST_THREAD_STACK_SIZE (256 * 16)
-
 #define STARTSTOP_BUTTON_WAIT_TIMEOUT 50U
 
 /**********************************************************************************************************************
@@ -41,7 +39,7 @@ CREATE_MODULE_NAME_EMPTY
 static const sTaskDesc_t g_test_thread_attributes = {
     .name = "Test",
     .stack_size = MAIN_TEST_THREAD_STACK_SIZE,
-    .priority = eTaskPriority_Normal
+    .priority = MAIN_TEST_THREAD_PRIORITY
 };
 /* clang-format on */
 

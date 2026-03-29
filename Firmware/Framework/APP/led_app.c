@@ -41,7 +41,7 @@ static sLedCommandDesc_t g_received_task = {.task = eLedTask_Last, .data = NULL}
 static bool g_is_initialized = false;
 
 static TaskHandle_t g_led_thread = NULL;
-static StackType_t g_led_thread_stack[STACK_SIZE_IN_BYTES(LED_THREAD_STACK_SIZE)] = {0};
+static StackType_t g_led_thread_stack[STACK_SIZE_IN_BYTES(LED_APP_THREAD_STACK_SIZE)] = {0};
 static StaticTask_t g_led_thread_buffer = {0};
 
 static QueueHandle_t g_led_message_queue = NULL;
