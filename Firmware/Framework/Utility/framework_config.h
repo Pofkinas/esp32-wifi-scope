@@ -44,4 +44,9 @@
 #error "CUSTOM_CMD requires ENABLE_CLI to be defined."
 #endif /* CUSTOM_CMD && !ENABLE_CLI */
 
+#if defined(ENABLE_CAPTURE) && !defined(ENABLE_ADC)
+#error "CAPTURE currently requires ADC to be enabled."
+#endif /* ENABLE_CAPTURE && !ENABLE_ADC */
+
+
 #endif /* SOURCE_UTILITY_FRAMEWORK_CONFIG_H_ */

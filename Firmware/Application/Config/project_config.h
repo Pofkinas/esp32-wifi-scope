@@ -52,6 +52,9 @@
 /// Utilities
 #define ENABLE_COLOUR
 
+/// Misc
+#define ENABLE_CAPTURE
+
 //=============================================================================
 // SYSTEM CONFIGURATION
 //-----------------------------------------------------------------------------
@@ -153,6 +156,7 @@
 #define DEBUG_UART_API
 #define DEBUG_IO_API
 #define DEBUG_LED_API
+#define DEBUG_CAPTURE_API
 #endif /* ENABLE_UART_DEBUG */
 
 //=============================================================================
