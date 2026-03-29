@@ -54,6 +54,7 @@
 
 /// Misc
 #define ENABLE_CAPTURE
+#define ENABLE_VOLTAGE
 
 //=============================================================================
 // SYSTEM CONFIGURATION

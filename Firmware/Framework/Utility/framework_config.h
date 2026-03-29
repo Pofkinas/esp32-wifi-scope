@@ -48,5 +48,8 @@
 #error "CAPTURE currently requires ADC to be enabled."
 #endif /* ENABLE_CAPTURE && !ENABLE_ADC */
 
+#if defined(ENABLE_VOLTAGE) && !defined(ENABLE_ADC)
+#error "VOLTAGE requires ADC to be enabled."
+#endif /* ENABLE_VOLTAGE && !ENABLE_ADC */
 
 #endif /* SOURCE_UTILITY_FRAMEWORK_CONFIG_H_ */

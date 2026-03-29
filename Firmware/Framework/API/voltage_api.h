@@ -1,33 +1,24 @@
-#ifndef SOURCE_DRIVER_ADC_DRIVER_H
-#define SOURCE_DRIVER_ADC_DRIVER_H
+#ifndef SOURCE_API_VOLTAGE_API_H
+#define SOURCE_API_VOLTAGE_API_H
 /**********************************************************************************************************************
  * Includes
  *********************************************************************************************************************/
 
 #include "framework_config.h"
 
-#if defined(ENABLE_ADC)
+#if defined(ENABLE_VOLTAGE)
 #include <stdbool.h>
 #include <stdint.h>
-#include <stddef.h>
 #include "adc_config.h"
+#include "capture_api.h"
 
 /**********************************************************************************************************************
  * Exported definitions and macros
  *********************************************************************************************************************/
 
-typedef enum eAdcEvent {
-    eAdcEvent_First = 0,
-    eAdcEvent_CaptureDone = eAdcEvent_First,
-    eAdcEvent_Overflow,
-    eAdcEvent_Last
-} eAdcEvent_t;
-
 /**********************************************************************************************************************
  * Exported types
  *********************************************************************************************************************/
-
-typedef void (*adc_callback_t)(const eAdc_t adc, const eAdcEvent_t event, bool *yield_from_isr);
 
 /**********************************************************************************************************************
  * Exported variables
@@ -37,15 +28,8 @@ typedef void (*adc_callback_t)(const eAdc_t adc, const eAdcEvent_t event, bool *
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-// Note: ADC configured for continuous sampling mode
-bool ADC_Driver_InitDevice(const eAdc_t adc, adc_callback_t adc_callback);
-bool ADC_Driver_Start(const eAdc_t adc);
-bool ADC_Driver_Stop(const eAdc_t adc);
-bool ADC_Driver_Read(const eAdc_t adc);
-bool ADC_Driver_GetChannelData(const eAdc_t adc, const eAdcChannel_t channel, uint32_t **data, size_t *size);
-bool ADC_Driver_ClearBuffer(const eAdc_t adc);
-bool ADC_Driver_Calibrate(const eAdc_t adc);
-bool ADC_Driver_GetCalibrationVoltage(const eAdc_t adc, const eAdcChannel_t channel, const uint32_t raw_data, uint32_t *voltage);
+bool Voltage_API_Init(const eAdc_t adc);
+bool Voltage_API_Process(const uint32_t *raw_data, void *out_data, size_t elements, void *context);
 
-#endif /* ENABLE_ADC */
-#endif /* SOURCE_DRIVER_ADC_DRIVER_H */
+#endif /* ENABLE_VOLTAGE */
+#endif /* SOURCE_API_VOLTAGE_API_H */

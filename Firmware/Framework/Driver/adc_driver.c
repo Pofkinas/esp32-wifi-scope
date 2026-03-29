@@ -300,4 +300,53 @@ bool ADC_Driver_ClearBuffer(const eAdc_t adc) {
     return true;
 }
 
+bool ADC_Driver_Calibrate(const eAdc_t adc) {
+    if (!ADC_Config_IsCorrectAdc(adc)) {
+        return false;
+    }
+
+    if (eAdcState_Initialized != g_adc_dynamic[adc].state) {
+        return false;
+    }
+
+#if ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
+    adc_cali_curve_fitting_config_t calib_config = {0};
+#elif ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
+    adc_cali_line_fitting_config_t calib_config = {0};
+#endif /* ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED */
+
+    for (eAdcChannel_t channel = eAdcChannel_First; channel < eAdcChannel_Last; channel++) {
+        calib_config.unit_id = g_adc_lut[adc].channel_desc[channel].periph;
+        calib_config.atten = g_adc_lut[adc].channel_desc[channel].attenuation;
+        calib_config.bitwidth = g_adc_lut[adc].channel_desc[channel].bit_width;
+#if ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
+        calib_config.chan = g_adc_lut[adc].channel_desc[channel].channel;
+
+        if (ESP_OK != adc_cali_create_scheme_curve_fitting(&calib_config, &g_adc_channel_dynamic[adc][channel].calib_handle)) {
+            return false;
+        }
+#elif ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
+        calib_config.default_vref = g_adc_lut[adc].channel_desc[channel].v_ref;
+
+        if (ESP_OK != adc_cali_create_scheme_line_fitting(&calib_config, &g_adc_channel_dynamic[adc][channel].calib_handle)) {
+            return false;
+        }
+#endif /* ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED */
+    }
+
+    return true;
+}
+
+bool ADC_Driver_GetCalibrationVoltage(const eAdc_t adc, const eAdcChannel_t channel, const uint32_t raw_data, uint32_t *voltage) {
+    if (!ADC_Config_IsCorrectAdc(adc) || !ADC_Config_IsCorrectAdcChannel(channel)) {
+        return false;
+    }
+
+    if (NULL == voltage) {
+        return false;
+    }
+
+    return (ESP_OK == adc_cali_raw_to_voltage(g_adc_channel_dynamic[adc][channel].calib_handle, raw_data, (int *) voltage));
+}
+
 #endif /* ENABLE_ADC */
