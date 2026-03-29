@@ -38,7 +38,7 @@ typedef enum eUartState {
 typedef struct sUartDriver {
     eUart_t uart;
     eUartState_t state;
-    RingBuffer_Handle ring_buffer;
+    sRingBuffer_Handle_t ring_buffer;
     TaskHandle_t feeder_thread;
     StackType_t thread_stack[STACK_SIZE_IN_BYTES(UART_FEEDER_THREAD_STACK_SIZE)];
     StaticTask_t thread_buffer;
@@ -124,7 +124,7 @@ static void UART_Driver_Feeder(void *pvParameters) {
             return;
         }
 
-        Ring_Buffer_Push(g_uart_dynamic_lut[uart].ring_buffer, rx_data);
+        Ring_Buffer_Push(g_uart_dynamic_lut[uart].ring_buffer, &rx_data);
 
         xSemaphoreGiveRecursive(g_uart_dynamic_lut[uart].mutex);
 
@@ -201,7 +201,7 @@ bool UART_Driver_Init(const eUart_t uart, const eBaudrate_t baudrate, data_recei
     }
 
     g_uart_dynamic_lut[uart].uart = uart;
-    g_uart_dynamic_lut[uart].ring_buffer = Ring_Buffer_Init(g_uart_lut[uart].ring_buffer_capacity);
+    g_uart_dynamic_lut[uart].ring_buffer = Ring_Buffer_Init(g_uart_lut[uart].ring_buffer_capacity, sizeof(uint8_t));
 
     if (NULL == g_uart_dynamic_lut[uart].ring_buffer) {
         return false;
