@@ -10,7 +10,7 @@
 //=============================================================================
 // FEATURE FLAGS
 //-----------------------------------------------------------------------------
-/// Uncomment the flags for the peripherals and modules you need:
+/// Uncomment the flags for the project peripherals and modules:
 
 /// -- GPIO                    // Enable GPIO functionality
 #define ENABLE_GPIO
@@ -23,6 +23,9 @@
 
 /// -- PWM                     // Enable PWM functionality
 #define ENABLE_PWM
+
+/// -- ADC                     // Enable ADC functionality
+#define ENABLE_ADC
 
 /// -- DEBUG UART              // Enable Debug UART functionality
 #define ENABLE_UART_DEBUG
@@ -45,9 +48,6 @@
 
 /// -- EXTI                    // Enable EXTI functionality
 #define ENABLE_EXTI
-
-/// -- DMA                     // Enable DMA functionality
-#define ENABLE_DMA
 
 /// Utilities
 #define ENABLE_COLOUR

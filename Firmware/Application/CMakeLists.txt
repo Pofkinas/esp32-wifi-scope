@@ -19,7 +19,7 @@ endif()
 idf_component_register(
     SRCS         ${app_sources}
     INCLUDE_DIRS ${app_include_dirs}
-    REQUIRES     driver freertos esp_common
+    REQUIRES     driver freertos esp_common esp_adc
 )
 
 if(TARGET framework_lib)
@@ -30,6 +30,7 @@ if(TARGET framework_lib)
         idf::driver
         idf::freertos
         idf::esp_common
+        idf::esp_adc
     )
 
     target_compile_definitions(framework_lib PUBLIC
