@@ -170,6 +170,8 @@ static void LED_API_PulseTimerCallback(TimerHandle_t xTimer) {
 
     PWM_Driver_ChangeDutyCycle(g_pwm_led_desc_lut[led_pulse_desc->led].pwm_device, led_pulse_desc->current_duty_cycle);
 
+    led_pulse_desc->pwm_change_count++;
+
     if (led_pulse_desc->pwm_change_count >= led_pulse_desc->pwm_changes_per_pulse) {
         if (led_pulse_desc->count_dir_up) {
             led_pulse_desc->count_dir_up = false;
@@ -195,8 +197,6 @@ static void LED_API_PulseTimerCallback(TimerHandle_t xTimer) {
             led_pulse_desc->current_duty_cycle = 0;
         }
     }
-
-    led_pulse_desc->pwm_change_count++;
 
     if (led_pulse_desc->pulse_count >= led_pulse_desc->total_pulses) {
         // TODO: redefine pdMS_TO_TICKS with guard 0/1, and compilation error if arg time is less than configTICK_RATE_HZ
@@ -507,7 +507,7 @@ bool LED_API_Pulse(const eLedPwm_t led, const size_t pulsing_time, const uint16_
     g_led_pulse_lut[led].duty_cycle_change = g_led_pulse_lut[led].timer_resolution / g_led_pulse_lut[led].pwm_changes_per_pulse;
 
     g_led_pulse_lut[led].pwm_change_count = 0;
-    g_led_pulse_lut[led].current_duty_cycle = g_led_pulse_lut[led].duty_cycle_change;
+    g_led_pulse_lut[led].current_duty_cycle = 0;
     g_led_pulse_lut[led].count_dir_up = true;
 
     // TODO: redefine pdMS_TO_TICKS with guard 0/1, and compilation error if arg time is less than configTICK_RATE_HZ
