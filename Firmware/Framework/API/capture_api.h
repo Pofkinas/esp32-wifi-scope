@@ -38,15 +38,15 @@ typedef enum eCaptureEvent {
     eCaptureEvent_Last
 } eCaptureEvent_t;
 
-typedef bool (*capture_process_t)(const uint32_t *raw_data, void *out_data, size_t elements, void *context);
+typedef bool (*capture_process_t)(uint32_t *raw_data, void *out_data, size_t elements, const void *context);
 typedef void (*capture_notify_t)(const eCaptureDevice_t device, const eCaptureEvent_t event);
 
 typedef struct sCaptureDesc {
     eCaptureType_t type;
-    void *device_data;
+    void const *device_data;
     size_t data_size;
     capture_process_t process_callback;
-    void *process_context;
+    void const *process_context;
     capture_notify_t notify_callback;
 } sCaptureDesc_t;
 

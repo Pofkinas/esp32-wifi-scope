@@ -6,6 +6,7 @@
 
 #if defined(ENABLE_CAPTURE)
 #include <stdio.h>
+#include "heap_api.h"
 #include "debug_api.h"
 #include "adc_driver.h"
 
@@ -48,6 +49,7 @@ typedef struct sCaptureDynamic {
     size_t data_to_capture;
     SemaphoreHandle_t mutex;
     StaticSemaphore_t mutex_buffer;
+    void *processed_data;
 } sCaptureDynamic_t;
 
 typedef struct sCaptureAdc {
@@ -190,34 +192,20 @@ static bool Capture_API_HandleAdcEvent(const eAdc_t adc, const eAdcEvent_t event
                     continue;
                 }
 
-                uint32_t *out_data_array = NULL;
                 bool is_data_processed = (NULL != g_capture_dynamic[device].desc.process_callback);
 
                 if (is_data_processed) {
-                    out_data_array = (uint32_t *) malloc(data_size * sizeof(uint32_t));
-                    if (NULL == out_data_array) {
-                        TRACE_ERR("Thread: Failed to allocate output buffer for device [%d]\n", device);
-                        continue;
-                    }
-
-                    if (!g_capture_dynamic[device].desc.process_callback(data, out_data_array, data_size, g_capture_dynamic[device].desc.process_context)) {
+                    if (!g_capture_dynamic[device].desc.process_callback(data, &g_capture_dynamic[device].processed_data, data_size, g_capture_dynamic[device].desc.process_context)) {
                         TRACE_WRN("Thread: Failed to process data for device [%d]\n", device);
-                        free(out_data_array);
+
                         continue;
                     }
                 }
 
-                void *push_data = is_data_processed ? out_data_array : data;
+                void *push_data = is_data_processed ? g_capture_dynamic[device].processed_data : data;
+
                 if (!Ring_Buffer_PushBulk(g_capture_dynamic[device].buffer, push_data, data_size)) {
                     TRACE_WRN("Thread: Failed to push data to buffer for device [%d]\n", device);
-                    if (is_data_processed) {
-                        free(out_data_array);
-                    }
-                    break;
-                }
-
-                if (is_data_processed) {
-                    free(out_data_array);
                 }
 
                 g_capture_dynamic[device].data_captured += data_size;
@@ -300,6 +288,20 @@ bool Capture_API_Init(const eCaptureDevice_t device, const sCaptureDesc_t *desc,
 
             return false;
         } break;
+    }
+
+    if (!Heap_API_Init()) {
+        TRACE_ERR("Init: Heap_API_Init failed for device [%d]\n", device);
+
+        return false;
+    }
+
+    g_capture_dynamic[device].processed_data = Heap_API_Malloc(desc->data_size);
+
+    if (NULL == g_capture_dynamic[device].processed_data) {
+        TRACE_ERR("Init: Failed to alloc for device [%d]\n", device);
+
+        return false;
     }
 
     g_capture_dynamic[device].mutex = xSemaphoreCreateRecursiveMutexStatic(&g_capture_dynamic[device].mutex_buffer);

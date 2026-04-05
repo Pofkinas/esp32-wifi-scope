@@ -29,7 +29,7 @@
  *********************************************************************************************************************/
 
 bool Voltage_API_Init(const eAdc_t adc);
-bool Voltage_API_Process(const uint32_t *raw_data, void *out_data, size_t elements, void *context);
+bool Voltage_API_Process(uint32_t *raw_data, void *out_data, size_t elements, const void *context);
 
 #endif /* ENABLE_VOLTAGE */
 #endif /* SOURCE_API_VOLTAGE_API_H */

@@ -60,18 +60,25 @@ bool Voltage_API_Init(const eAdc_t adc) {
     return true;
 }
 
-bool Voltage_API_Process(const uint32_t *raw_data, void *out_data, size_t elements, void *context) {
+bool Voltage_API_Process(uint32_t *raw_data, void *out_data, size_t elements, const void *context) {
     if ((NULL == out_data) || (NULL == context)) {
         return false;
     }
 
     sAdcConfig_t *desc = (sAdcConfig_t *) context;
 
+    uint32_t processed_data = 0;
+
     for (size_t i = 0; i < elements; i++) {
-        if (!ADC_Driver_GetCalibrationVoltage(desc->adc, desc->channel, raw_data[i], &((uint32_t *) out_data)[i])) {
+        if (!ADC_Driver_GetCalibrationVoltage(desc->adc, desc->channel, raw_data[i], &processed_data)) {
             return false;
         }
+
+        // Reuse raw_data buffer to store processed voltage values
+        ((uint16_t *) raw_data)[i] = (uint16_t) processed_data;
     }
+
+    *(uint16_t **) out_data = (uint16_t *) raw_data;
 
     return true;
 }
