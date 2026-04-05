@@ -39,7 +39,8 @@
 
 typedef enum eCliCustomCmd {
     eCliCustomCmd_First = 0,
-    eCliCustomCmd_LedBlink,
+    eCliCustomCmd_StartOscilloscope,
+    eCliCustomCmd_StopOscilloscope,
     eCliCustomCmd_Last
 } eCliCustomCmd_t;
 

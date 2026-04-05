@@ -1,38 +1,30 @@
-#ifndef APPLICATION_CUSTOM_CLI_CMD_H_
-#define APPLICATION_CUSTOM_CLI_CMD_H_
-
-/***********************************************************************************************************************
- * @file 
- * @brief Custom CLI command handler header file for the Pofkinas Development Framework (PDF).
- * 
- * This file is part of the Pofkinas Development Framework (PDF) and contains custom command handler definition for the CLI application.
- * 
- * @note Place this file in the Application/ folder of your project define.
- * 
- * @details
- * custom_cli_cmd.h
- * 
- * Usage:
- * 1. Place this file in your Application/ folder of your project (e.g. ProjectName/Application/).
- * 2. Add PDF (Pofkinas Development Framework) to your project. Latest version can be found at: https://github.com/Pofkinas/pdf
- * 3. Define your custom commands handlers.
- * 4. Implement the custom commands handlers in `custom_cli_cmd.c`.
- ***********************************************************************************************************************/
-
+#ifndef APPLICATION_OSCILLOSCOPE_APP_H
+#define APPLICATION_OSCILLOSCOPE_APP_H
 /**********************************************************************************************************************
  * Includes
  *********************************************************************************************************************/
 
 #include "framework_config.h"
 
-#if defined(ENABLE_CUSTOM_CMD)
 #include <stdbool.h>
-#include "message.h"
-#include "error_messages.h"
 
 /**********************************************************************************************************************
  * Exported definitions and macros
  *********************************************************************************************************************/
+
+// Each voltage sample is represented as uint16_t (2 bytes), so a 1 KB chunk holds 512 samples.
+// ADC running @10 kSps generates 10000 * 2 = 20000 B/s split across 30 frames,
+// each sending (20000 / 30) ~= 667 B — fits in 1 chunk.
+#define FRAME_SIZE 1024
+#define MAX_FRAMES 128
+
+#define FRAMES_PER_SECOND 50
+
+// Data header format: "<timestamp>{separator}<frame_number>{separator}<total_bytes>{delimiter}"
+// Total bytes is the number of bytes captured in frame
+#define FRAME_HEADER_SIZE 32
+#define FRAME_HEADER_DELIMITER "\n"
+#define FRAME_HEADER_SEPARATOR " "
 
 /**********************************************************************************************************************
  * Exported types
@@ -46,8 +38,9 @@
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-eErrorCode_t Custom_CLI_CMD_OscilloscopeStart(sMessage_t arguments, sMessage_t *response);
-eErrorCode_t Custom_CLI_CMD_OscilloscopeStop(sMessage_t arguments, sMessage_t *response);
+bool Oscilloscope_APP_Init(void);
+bool Oscilloscope_APP_Start(void);
+bool Oscilloscope_APP_Pause(void);
+bool Oscilloscope_APP_Stop(void);
 
-#endif /* ENABLE_CUSTOM_CMD */
-#endif /* APPLICATION_CUSTOM_CLI_CMD_H_ */
+#endif /* APPLICATION_OSCILLOSCOPE_APP_H */

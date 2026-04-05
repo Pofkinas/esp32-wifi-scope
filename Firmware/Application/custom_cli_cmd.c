@@ -27,22 +27,15 @@
 #include "custom_cli_cmd.h"
 
 #if defined(ENABLE_CUSTOM_CMD)
-#include <stdint.h>
-#include <stddef.h>
 #include <string.h>
-#include "led_app.h"
+#include "oscilloscope_app.h"
 #include "cmd_api_helper.h"
-#include "heap_api.h"
-#include "led_api.h"
 #include "debug_api.h"
 #include "error_messages.h"
 
 /**********************************************************************************************************************
  * Private definitions and macros
  *********************************************************************************************************************/
-
-#define LED_SEPARATOR ","
-#define LED_SEPARATOR_LENGTH (sizeof(LED_SEPARATOR) - 1)
 
 /**********************************************************************************************************************
  * Private typedef
@@ -78,7 +71,7 @@ CREATE_MODULE_NAME_EMPTY
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-eErrorCode_t Custom_CLI_CMD_Led_Blink(sMessage_t arguments, sMessage_t *response) {
+eErrorCode_t Custom_CLI_CMD_OscilloscopeStart(sMessage_t arguments, sMessage_t *response) {
     if (NULL == response) {
         TRACE_ERR("Invalid data pointer\n");
 
@@ -91,71 +84,32 @@ eErrorCode_t Custom_CLI_CMD_Led_Blink(sMessage_t arguments, sMessage_t *response
         return eErrorCode_NULLPTR;
     }
 
-    eLed_t led;
-    size_t led_value = 0;
-    size_t blink_time = 0;
-    size_t blink_frequency = 0;
-    eErrorCode_t error = eErrorCode_OK;
+    if (!Oscilloscope_APP_Start()) {
+        sprintf(response->data, "Failed to start oscilloscope\n");
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &led_value, LED_SEPARATOR, LED_SEPARATOR_LENGTH, response);
-    if (eErrorCode_OK != error) {
-        return error;
+        return eErrorCode_FAILED;
     }
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &blink_time, LED_SEPARATOR, LED_SEPARATOR_LENGTH, response);
-    if (eErrorCode_OK != error) {
-        return error;
+    snprintf(response->data, response->size, "Operation successful\n");
+
+    return eErrorCode_OK;
+}
+
+eErrorCode_t Custom_CLI_CMD_OscilloscopeStop(sMessage_t arguments, sMessage_t *response) {
+    if (NULL == response) {
+        TRACE_ERR("Invalid data pointer\n");
+
+        return eErrorCode_NULLPTR;
     }
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &blink_frequency, LED_SEPARATOR, LED_SEPARATOR_LENGTH, response);
-    if (eErrorCode_OK != error) {
-        return error;
+    if (NULL == response->data) {
+        TRACE_ERR("Invalid response data pointer\n");
+
+        return eErrorCode_NULLPTR;
     }
 
-    if (0 != arguments.size) {
-        snprintf(response->data, response->size, "Too many arguments\n");
-
-        return eErrorCode_ARGMANY;
-    }
-
-    led = led_value;
-
-    if (!LED_Config_IsCorrectLed(led)) {
-        snprintf(response->data, response->size, "%d: Incorrect led\n", led);
-
-        return eErrorCode_INVAL;
-    }
-
-    if (!LED_API_IsCorrectBlinkTime(blink_time)) {
-        snprintf(response->data, response->size, "%d: Incorrect blink time\n", blink_time);
-
-        return eErrorCode_INVAL;
-    }
-
-    if (!LED_API_IsCorrectBlinkFrequency(blink_frequency)) {
-        snprintf(response->data, response->size, "%d: Incorrect blink frequency\n", blink_frequency);
-
-        return eErrorCode_INVAL;
-    }
-
-    sLedCommandDesc_t formated_task = {.task = eLedTask_Blink, .data = NULL};
-    sLedBlink_t *task_data = Heap_API_Calloc(1, sizeof(sLedBlink_t));
-
-    if (NULL == task_data) {
-        snprintf(response->data, response->size, "Failed Calloc\n");
-
-        return eErrorCode_NOMEM;
-    }
-
-    task_data->led = led;
-    task_data->blink_time = blink_time;
-    task_data->blink_frequency = blink_frequency;
-    formated_task.data = task_data;
-
-    if (!LED_APP_AddTask(&formated_task)) {
-        snprintf(response->data, response->size, "Failed task add\n");
-
-        Heap_API_Free(task_data);
+    if (!Oscilloscope_APP_Stop()) {
+        snprintf(response->data, response->size, "Failed to stop oscilloscope\n");
 
         return eErrorCode_FAILED;
     }

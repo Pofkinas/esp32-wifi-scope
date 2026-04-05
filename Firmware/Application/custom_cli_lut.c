@@ -53,11 +53,14 @@
 
 /* clang-format off */
 sCmdDesc_t g_custom_cmd_lut[eCliCustomCmd_Last] = {
-    [eCliCustomCmd_LedBlink] = {
-        DEFINE_CMD("custom_led_blink:"),
-        .handler = Custom_CLI_CMD_Led_Blink
-        /* e. g. custom_led_blink:<eLed_t>, <duration>, <frequency> */
+    [eCliCustomCmd_StartOscilloscope] = {
+        DEFINE_CMD("scope_start"),
+        .handler = Custom_CLI_CMD_OscilloscopeStart
     },
+    [eCliCustomCmd_StopOscilloscope] = {
+        DEFINE_CMD("scope_stop"),
+        .handler = Custom_CLI_CMD_OscilloscopeStop
+    }
 };
 /* clang-format on */
 

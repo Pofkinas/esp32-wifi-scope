@@ -82,8 +82,8 @@
 #define CAPTURE_API_THREAD_STACK_SIZE (256 * 36)
 #define CAPTURE_API_THREAD_PRIORITY eTaskPriority_Normal
 
-#define MAIN_TEST_THREAD_STACK_SIZE (256 * 36)
-#define MAIN_TEST_THREAD_PRIORITY eTaskPriority_Normal
+#define OSCILLOSCOPE_THREAD_STACK_SIZE (256 * 36)
+#define OSCILLOSCOPE_THREAD_PRIORITY eTaskPriority_Normal
 
 //=============================================================================
 // UART CONFIGURATION
@@ -144,6 +144,7 @@
 // Custom debug flags
 #define DEBUG_MAIN
 #define CUSTOM_CLI_CMD_HANDLERS
+#define DEBUG_OSCILLOSCOPE_APP
 
 // APP layer debug flags
 #define DEBUG_CLI_APP
