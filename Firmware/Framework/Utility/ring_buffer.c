@@ -51,7 +51,6 @@ sRingBuffer_Handle_t Ring_Buffer_Init(size_t buffer_capacity, size_t data_size) 
     sRingBuffer_Handle_t ring_buffer = malloc(sizeof(struct sRingBufferDesc));
 
     if (NULL == ring_buffer) {
-        free(ring_buffer);
         return NULL;
     }
 
@@ -208,7 +207,7 @@ bool Ring_Buffer_Clear(sRingBuffer_Handle_t ring_buffer) {
         return false;
     }
 
-    memset(ring_buffer->buffer, 0, (ring_buffer->count * ring_buffer->data_size));
+    memset(ring_buffer->buffer, 0, (ring_buffer->buffer_capacity * ring_buffer->data_size));
 
     ring_buffer->head = 0;
     ring_buffer->tail = 0;
