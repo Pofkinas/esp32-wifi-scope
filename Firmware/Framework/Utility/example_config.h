@@ -43,7 +43,7 @@
 
 /// -- CMD                     // Enable Command API modules
 #define ENABLE_CMD
-#define ENABLE_CMD_HELPER
+#define ENABLE_CMD_PARSER
 #define ENABLE_DEFAULT_CMD
 #define ENABLE_CUSTOM_CMD
 
@@ -226,7 +226,6 @@
 
 // API layer debug flags
 #define DEBUG_CMD_API
-#define DEBUG_CMD_API_HELPER
 #define DEBUG_UART_API
 #define DEBUG_IO_API
 #define DEBUG_LCD_API

@@ -2,9 +2,9 @@
  * Includes
  *********************************************************************************************************************/
 
-#include "cmd_api_helper.h"
+#include "cmd_parser.h"
 
-#if defined(ENABLE_CMD_HELPER)
+#if defined(ENABLE_CMD_PARSER)
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -41,7 +41,7 @@
  * Definitions of exported functions
  *********************************************************************************************************************/
 
-eErrorCode_t CMD_API_Helper_ParseToken(char **token, sMessage_t *argument, char *separator, sMessage_t *response) {
+eErrorCode_t CMD_Parser_ParseToken(char **token, sMessage_t *argument, char *separator, sMessage_t *response) {
     if ((NULL == token) || (NULL == separator) || (NULL == response)) {
         return eErrorCode_NULLPTR;
     }
@@ -61,11 +61,11 @@ eErrorCode_t CMD_API_Helper_ParseToken(char **token, sMessage_t *argument, char 
     return eErrorCode_OK;
 }
 
-eErrorCode_t CMD_API_Helper_FindNextArgUInt(sMessage_t *argument, size_t *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
+eErrorCode_t CMD_Parser_FindNextArgUInt(sMessage_t *argument, size_t *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
     char *argument_token = NULL;
     char *invalid_character = NULL;
 
-    eErrorCode_t error = CMD_API_Helper_ParseToken(&argument_token, argument, separator, response);
+    eErrorCode_t error = CMD_Parser_ParseToken(&argument_token, argument, separator, response);
 
     if (eErrorCode_OK != error) {
         return error;
@@ -91,11 +91,11 @@ eErrorCode_t CMD_API_Helper_FindNextArgUInt(sMessage_t *argument, size_t *return
     return eErrorCode_OK;
 }
 
-eErrorCode_t CMD_API_Helper_FindNextArgInt(sMessage_t *argument, int *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
+eErrorCode_t CMD_Parser_FindNextArgInt(sMessage_t *argument, int *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
     char *argument_token = NULL;
     char *invalid_character = NULL;
 
-    eErrorCode_t error = CMD_API_Helper_ParseToken(&argument_token, argument, separator, response);
+    eErrorCode_t error = CMD_Parser_ParseToken(&argument_token, argument, separator, response);
 
     if (eErrorCode_OK != error) {
         return error;
@@ -121,11 +121,11 @@ eErrorCode_t CMD_API_Helper_FindNextArgInt(sMessage_t *argument, int *return_arg
     return eErrorCode_OK;
 }
 
-eErrorCode_t CMD_API_Helper_FindNextArgFloat(sMessage_t *argument, float *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
+eErrorCode_t CMD_Parser_FindNextArgFloat(sMessage_t *argument, float *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
     char *argument_token = NULL;
     char *invalid_character = NULL;
 
-    eErrorCode_t error = CMD_API_Helper_ParseToken(&argument_token, argument, separator, response);
+    eErrorCode_t error = CMD_Parser_ParseToken(&argument_token, argument, separator, response);
 
     if (eErrorCode_OK != error) {
         return error;
@@ -151,10 +151,10 @@ eErrorCode_t CMD_API_Helper_FindNextArgFloat(sMessage_t *argument, float *return
     return eErrorCode_OK;
 }
 
-eErrorCode_t CMD_API_Helper_FindNextArgChar(sMessage_t *argument, char *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
+eErrorCode_t CMD_Parser_FindNextArgChar(sMessage_t *argument, char *return_argument, char *separator, const size_t separator_lenght, sMessage_t *response) {
     char *argument_token = NULL;
 
-    eErrorCode_t error = CMD_API_Helper_ParseToken(&argument_token, argument, separator, response);
+    eErrorCode_t error = CMD_Parser_ParseToken(&argument_token, argument, separator, response);
 
     if (eErrorCode_OK != error) {
         return error;
@@ -174,4 +174,4 @@ eErrorCode_t CMD_API_Helper_FindNextArgChar(sMessage_t *argument, char *return_a
     return eErrorCode_OK;
 }
 
-#endif /* ENABLE_CMD_HELPER */
+#endif /* ENABLE_CMD_PARSER */

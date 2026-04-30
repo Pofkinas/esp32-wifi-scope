@@ -37,7 +37,7 @@
 
 /// -- CMD                     // Enable Command API modules
 #define ENABLE_CMD
-#define ENABLE_CMD_HELPER
+#define ENABLE_CMD_PARSER
 
 /// -- LEDs                    // Enable LED functionality
 #define ENABLE_LED
@@ -154,7 +154,6 @@
 
 // API layer debug flags
 #define DEBUG_CMD_API
-#define DEBUG_CMD_API_HELPER
 #define DEBUG_UART_API
 #define DEBUG_IO_API
 #define DEBUG_LED_API

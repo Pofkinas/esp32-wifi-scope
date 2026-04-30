@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "led_app.h"
-#include "cmd_api_helper.h"
+#include "cmd_parser.h"
 #include "heap_api.h"
 #include "led_api.h"
 #include "debug_api.h"
@@ -76,7 +76,7 @@ static eErrorCode_t CLI_CMD_Led_Common(sMessage_t arguments, sMessage_t *respons
 
     eErrorCode_t error = eErrorCode_OK;
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &led_value, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &led_value, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
@@ -164,19 +164,19 @@ eErrorCode_t CLI_CMD_Led_Blink(sMessage_t arguments, sMessage_t *response) {
     size_t blink_frequency = 0;
     eErrorCode_t error = eErrorCode_OK;
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &led_value, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &led_value, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
     }
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &blink_time, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &blink_time, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
     }
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &blink_frequency, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &blink_frequency, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
@@ -255,13 +255,13 @@ eErrorCode_t CLI_CMD_Pwm_LedSetBrightness(sMessage_t arguments, sMessage_t *resp
     size_t duty_cycle = 0;
     eErrorCode_t error = eErrorCode_OK;
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &led_value, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &led_value, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
     }
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &duty_cycle, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &duty_cycle, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
@@ -332,19 +332,19 @@ eErrorCode_t CLI_CMD_Pwm_LedPulse(sMessage_t arguments, sMessage_t *response) {
     size_t pulse_frequency = 0;
     eErrorCode_t error = eErrorCode_OK;
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &led_value, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &led_value, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
     }
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &pulse_time, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &pulse_time, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
     }
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &pulse_frequency, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &pulse_frequency, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
@@ -422,19 +422,19 @@ eErrorCode_t CLI_CMD_Led_RgbToHsv(sMessage_t arguments, sMessage_t *response) {
     size_t blue = 0;
     eErrorCode_t error = eErrorCode_OK;
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &red, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &red, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
     }
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &green, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &green, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
     }
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &blue, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &blue, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
@@ -483,19 +483,19 @@ eErrorCode_t CLI_CMD_Led_HsvToRgb(sMessage_t arguments, sMessage_t *response) {
     size_t value = 0;
     eErrorCode_t error = eErrorCode_OK;
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &hue, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &hue, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
     }
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &saturation, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &saturation, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
     }
 
-    error = CMD_API_Helper_FindNextArgUInt(&arguments, &value, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &value, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;

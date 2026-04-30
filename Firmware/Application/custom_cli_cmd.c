@@ -16,7 +16,7 @@
  * 3. Include the used module headers.
  * 4. Define command seperator symbol (e.g. `,`) and seperator length (e.g. `sizeof(SEPARATOR) - 1`).
  * 5. Imlement the custom commands.
- * 6. Use `CMD_API_Helper_FindNextArgUInt` to parse the command arguments.
+ * 6. Use `CMD_Parser_FindNextArgUInt` to parse the command arguments.
  * 7. Implement the custom commands handler definition header `custom_cli_cmd_handler.h`.
  ***********************************************************************************************************************/
 
@@ -29,7 +29,7 @@
 #if defined(ENABLE_CUSTOM_CMD)
 #include <string.h>
 #include "oscilloscope_app.h"
-#include "cmd_api_helper.h"
+#include "cmd_parser.h"
 #include "debug_api.h"
 #include "error_messages.h"
 
