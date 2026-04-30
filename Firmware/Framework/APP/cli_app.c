@@ -92,8 +92,12 @@ static void CLI_APP_Thread(void *pvParameters) {
             }
 #endif /* ENABLE_CUSTOM_CMD */
 
-            if ((eErrorCode_OK != error_code) && (NULL != g_response.data)) {
-                TRACE_WRN("%s", g_response.data);
+            if (eErrorCode_OK != error_code) {
+                if (eErrorCode_NOTFOUND == error_code) {
+                    TRACE_WRN("Command not found: %s", g_command.data);
+                } else if (NULL != g_response.data) {
+                    TRACE_WRN("%s", g_response.data);
+                }
             }
 
             Heap_API_Free(g_command.data);
