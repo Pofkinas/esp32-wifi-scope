@@ -21,6 +21,9 @@
 /// -- UART                    // Enable UART functionality
 #define ENABLE_UART
 
+/// -- Wi-Fi                   // Enable Wi-Fi functionality
+#define ENABLE_WIFI
+
 /// -- PWM                     // Enable PWM functionality
 #define ENABLE_PWM
 
@@ -160,7 +163,7 @@
 #define DEBUG_IO_API
 #define DEBUG_LED_API
 #define DEBUG_CAPTURE_API
-#endif /* ENABLE_UART_DEBUG */
+#define DEBUG_WIFI_API
 
 //=============================================================================
 // MISCELLANEOUS

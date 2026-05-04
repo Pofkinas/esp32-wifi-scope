@@ -20,6 +20,11 @@
 #include "led_config.h"
 #endif /* ENABLE_LED */
 
+#if defined(ENABLE_WIFI)
+#include "wifi_api.h"
+#include "wifi_config.h"
+#endif /* ENABLE_WIFI */
+
 /**********************************************************************************************************************
  * Private definitions and macros
  *********************************************************************************************************************/
@@ -503,6 +508,150 @@ eErrorCode_t CLI_CMD_Pwm_LedPulse(sMessage_t arguments, sMessage_t *response) {
     return eErrorCode_OK;
 }
 #endif /* ENABLE_PWM_LED */
+
+#if defined(ENABLE_WIFI)
+eErrorCode_t Custom_CLI_CMD_WifiConnect(sMessage_t arguments, sMessage_t *response) {
+    if ((NULL == response) || (NULL == response->data)) {
+        TRACE_ERR("Invalid response pointer\n");
+
+        return eErrorCode_NULLPTR;
+    }
+
+    // Command is intented to be used as stand alone or with arguments
+    if (0 == arguments.size) {
+        if (!Wifi_API_Connect(NULL, NULL)) {
+            snprintf(response->data, response->size, "Failed to connect to default Wi-Fi\n");
+
+            return eErrorCode_FAILED;
+        }
+
+        snprintf(response->data, response->size, "Wi-Fi connect to default initiated\n");
+
+        return eErrorCode_OK;
+    } else {
+        if (':' == arguments.data[0]) { // Filter ':' prefix if used with arguments
+            arguments.data++;
+            arguments.size--;
+        }
+
+        if (0 == arguments.size) {
+            snprintf(response->data, response->size, "Missing SSID\n");
+
+            return eErrorCode_ARGFEW;
+        }
+    }
+
+    char *parsed_token = NULL;
+    eErrorCode_t error = CMD_Parser_ParseToken(&parsed_token, &arguments, CMD_SEPARATOR, response);
+
+    if (eErrorCode_OK != error) {
+        return error;
+    }
+
+    if (NULL == parsed_token) {
+        snprintf(response->data, response->size, "Missing password\n");
+
+        return eErrorCode_ARGFEW;
+    }
+
+    char ssid[WIFI_SSID_MAX_LEN] = {0};
+
+    snprintf(ssid, sizeof(ssid), "%s", arguments.data);
+
+    arguments.size -= (parsed_token - arguments.data + CMD_SEPARATOR_LENGTH);
+    arguments.data = parsed_token + CMD_SEPARATOR_LENGTH;
+
+    if (0 == arguments.size) {
+        snprintf(response->data, response->size, "Missing password\n");
+
+        return eErrorCode_ARGFEW;
+    }
+
+    error = CMD_Parser_ParseToken(&parsed_token, &arguments, CMD_SEPARATOR, response);
+
+    if (eErrorCode_OK != error) {
+        return error;
+    }
+
+    char password[WIFI_PASSWORD_MAX_LEN] = {0};
+
+    snprintf(password, sizeof(password), "%s", arguments.data);
+
+    if (NULL != parsed_token) {
+        arguments.size -= (parsed_token - arguments.data + CMD_SEPARATOR_LENGTH);
+        arguments.data = parsed_token + CMD_SEPARATOR_LENGTH;
+
+        if (0 != arguments.size) {
+            snprintf(response->data, response->size, "Too many arguments\n");
+
+            return eErrorCode_ARGMANY;
+        }
+    }
+
+    if (!Wifi_API_Connect(ssid, password)) {
+        snprintf(response->data, response->size, "Failed to connect Wi-Fi\n");
+
+        return eErrorCode_FAILED;
+    }
+
+    snprintf(response->data, response->size, "Wi-Fi connect initiated\n");
+
+    return eErrorCode_OK;
+}
+
+eErrorCode_t Custom_CLI_CMD_WifiDisconnect(sMessage_t arguments, sMessage_t *response) {
+    if ((NULL == response) || (NULL == response->data)) {
+        TRACE_ERR("Invalid response pointer\n");
+
+        return eErrorCode_NULLPTR;
+    }
+
+    if (0 != arguments.size) {
+        snprintf(response->data, response->size, "Too many arguments\n");
+
+        return eErrorCode_ARGMANY;
+    }
+
+#if defined(ENABLE_TRANSPORT)
+    Transport_API_SetMode(eTransport_UART);
+#endif /* ENABLE_TRANSPORT */
+
+    if (!Wifi_API_Disconnect()) {
+        snprintf(response->data, response->size, "Failed to disconnect Wi-Fi\n");
+
+        return eErrorCode_FAILED;
+    }
+
+    snprintf(response->data, response->size, "Operation successful\n");
+
+    return eErrorCode_OK;
+}
+
+eErrorCode_t Custom_CLI_CMD_WifiStatus(sMessage_t arguments, sMessage_t *response) {
+    if ((NULL == response) || (NULL == response->data)) {
+        TRACE_ERR("Invalid response pointer\n");
+
+        return eErrorCode_NULLPTR;
+    }
+
+    if (0 != arguments.size) {
+        snprintf(response->data, response->size, "Too many arguments\n");
+
+        return eErrorCode_ARGMANY;
+    }
+
+    eWifiState_t state = Wifi_API_GetStatus();
+    uIPv4Address_t addr = {0};
+
+    Wifi_API_GetIpv4Address(&addr);
+
+    TRACE_INFO("Wi-Fi state: %d, IP: %u.%u.%u.%u\n", state, addr.octets[0], addr.octets[1], addr.octets[2], addr.octets[3]);
+
+    snprintf(response->data, response->size, "Operation successful\n");
+
+    return eErrorCode_OK;
+}
+#endif /* ENABLE_WIFI */
 
 eErrorCode_t CLI_CMD_Led_RgbToHsv(sMessage_t arguments, sMessage_t *response) {
     if (NULL == response) {

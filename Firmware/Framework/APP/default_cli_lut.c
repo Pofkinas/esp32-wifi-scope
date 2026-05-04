@@ -77,7 +77,25 @@ sCmdDesc_t g_default_cmd_lut[eCliDefaultCmd_Last] = {
         /* e. g. led_pulse:<eLedPwm_t>, <pulse_time>, <pulse_frequency> */
     },
 #endif /* ENABLE_PWM_LED */
-    
+
+// TODO: Really need WiFi APP thread here to deal with this, especially for connection management
+#if defined(ENABLE_WIFI)
+    [eCliCustomCmd_WifiConnect] = {
+        DEFINE_CMD("wifi_connect"),
+        .handler = Custom_CLI_CMD_WifiConnect
+        /* e. g. wifi_connect or wifi_connect:<ssid>, <password> */
+    },
+    [eCliCustomCmd_WifiDisconnect] = {
+        DEFINE_CMD("wifi_disconnect"),
+        .handler = Custom_CLI_CMD_WifiDisconnect
+        /* e. g. wifi_disconnect */
+    },
+    [eCliCustomCmd_WifiStatus] = {
+        DEFINE_CMD("wifi_status"),
+        .handler = Custom_CLI_CMD_WifiStatus
+        /* e. g. wifi_status */
+    },
+#endif /* ENABLE_WIFI */
     [eCliDefaultCmd_RgbToHsv] = {
         DEFINE_CMD("rgb:"),
         .handler = CLI_CMD_Led_RgbToHsv

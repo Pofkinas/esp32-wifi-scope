@@ -1,60 +1,43 @@
-#ifndef SOURCE_APP_CLI_CMD_HANDLERS_H_
-#define SOURCE_APP_CLI_CMD_HANDLERS_H_
+#ifndef APPLICATION_CONFIG_WIFI_CONFIG_H_
+#define APPLICATION_CONFIG_WIFI_CONFIG_H_
 /**********************************************************************************************************************
  * Includes
  *********************************************************************************************************************/
 
 #include "framework_config.h"
 
-#if defined(ENABLE_DEFAULT_CMD)
-#include "cmd_api.h"
+#include <stdint.h>
 
 /**********************************************************************************************************************
  * Exported definitions and macros
  *********************************************************************************************************************/
 
+#define WIFI_SSID_MAX_LEN 32
+#define WIFI_PASSWORD_MAX_LEN 64
+
+#define WIFI_DEFAULT_SSID "SSID"
+#define WIFI_DEFAULT_PASSWORD "PASSWORD"
+
+#define WIFI_MAX_RETRY 5
+
 /**********************************************************************************************************************
  * Exported types
  *********************************************************************************************************************/
 
-/* clang-format off */
-typedef enum eCliDefaultCmd {
-    eCliDefaultCmd_First = 0,
-    
-#if defined(ENABLE_LED)
-    eCliDefaultCmd_Led_Set,
-    eCliDefaultCmd_Led_Reset,
-    eCliDefaultCmd_Led_Toggle,
-    eCliDefaultCmd_Led_BlinkCount,
-    eCliDefaultCmd_Led_BlinkDuration,
-    eCliDefaultCmd_Led_StopBlink,
-#endif /* ENABLE_LED */
-    
-#if defined(ENABLE_PWM_LED)
-    eCliDefaultCmd_Pwm_LedSetBrightness,
-    eCliDefaultCmd_Pwm_LedPulse,
-#endif /* ENABLE_PWM_LED */
-
-#if defined(ENABLE_WIFI)
-    eCliCustomCmd_WifiConnect,
-    eCliCustomCmd_WifiDisconnect,
-    eCliCustomCmd_WifiStatus,
-#endif /* ENABLE_WIFI */
-    eCliDefaultCmd_RgbToHsv,
-    eCliDefaultCmd_HsvToRgb,
-    eCliDefaultCmd_Last
-} eCliDefaultCmd_t;
-/* clang-format on */
+typedef struct sWifiStaDesc {
+    char *default_ssid;
+    char *default_password;
+    uint8_t max_retry;
+} sWifiStaDesc_t;
 
 /**********************************************************************************************************************
  * Exported variables
  *********************************************************************************************************************/
 
-extern sCmdDesc_t g_default_cmd_lut[eCliDefaultCmd_Last];
-
 /**********************************************************************************************************************
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-#endif /* ENABLE_DEFAULT_CMD */
-#endif /* SOURCE_APP_DEFAULT_CLI_LUT_H_ */
+const sWifiStaDesc_t *Wifi_Config_GetWifiStaDesc(void);
+
+#endif /* APPLICATION_CONFIG_WIFI_CONFIG_H_ */
