@@ -13,10 +13,10 @@
  *********************************************************************************************************************/
 
 // Each voltage sample is represented as uint16_t (2 bytes), so a 1 KB chunk holds 512 samples.
-// ADC running @10 kSps generates 10000 * 2 = 20000 B/s split across 30 frames,
-// each sending (20000 / 30) ~= 667 B — fits in 1 chunk.
+// ADC running @50 kSps generates 50000 * 2 = 100000 B/s split across 30 frames,
+// each sending (100000 / 30) ~= 3333 B — fits in 1 chunk.
 #define FRAME_SIZE 1024
-#define MAX_FRAMES 128
+#define MAX_FRAMES 4
 
 #define FRAMES_PER_SECOND 50
 

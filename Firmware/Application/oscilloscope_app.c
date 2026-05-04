@@ -12,7 +12,8 @@
 #include "voltage_api.h"
 #include "io_api.h"
 #include "led_api.h"
-#include "uart_api.h"
+#include "wifi_api.h"
+#include "transport_api.h"
 #include "debug_api.h"
 #include "adc_config.h"
 #include "ring_buffer.h"
@@ -30,18 +31,23 @@
 #define MUTEX_TIMEOUT 0U
 #define HANDLE_DATA_MUTEX_TIMEOUT 2U
 #define FRAME_TIMER_TIMEOUT 0U
-#define UART_TX_TIMEOUT 0U
+#define TX_TIMEOUT 0U
 
 #define CAPTURE_ELEMENTS 256
 #define CAPTURE_BUFFER_SIZE 8192
 
-#define CAPTURE_DONE_EVENT 0x00000002U
-#define FRAME_DONE_EVENT 0x00000004U
-#define DATA_OVERFLOW_EVENT 0x00000008U
+#define CONNECTING_BLINK_FREQUENCY_HZ 1000U
+#define CONNECTED_BLINK_TIMES 5U
+#define CONNECTED_BLINK_FREQUENCY_HZ 200U
+
+#define CAPTURE_DONE_EVENT 0x00000010U
+#define FRAME_DONE_EVENT 0x00000040U
+#define DATA_OVERFLOW_EVENT 0x00000080U
 
 #define CAPTURE_DEVICE eCaptureDevice_Adc1ch0
 #define EVENT_ALL_BITS ((EventBits_t) 0x00FFFFFFU)
 #define START_STOP_EVENT BUTTON_TRIGGERED_EVENT
+#define DEFAULT_TRANSPORT_MODE eTransport_WiFi_UDP
 
 /**********************************************************************************************************************
  * Private typedef
@@ -74,6 +80,8 @@ static void Oscilloscope_SendFrames(sFrameData_t *const frame_data, char *const 
 
 static void Oscilloscope_CaptureNotifyCallback(const eCaptureDevice_t device, const eCaptureEvent_t event);
 static void Oscilloscope_FrameTimerCallback(TimerHandle_t timer);
+
+static void Oscilloscope_ConnectWifi(void);
 
 /**********************************************************************************************************************
  * Private constants
@@ -237,7 +245,7 @@ static void Oscilloscope_SendFrames(sFrameData_t *const frame_data, char *const 
 
     sMessage_t message = {.data = header, .size = strlen(header)};
 
-    UART_API_Send(UART0, message, UART_TX_TIMEOUT);
+    Transport_API_Send(message, TX_TIMEOUT);
 
     size_t complete_frames = frame_data->total_bytes / FRAME_SIZE;
     size_t partial_bytes = frame_data->total_bytes % FRAME_SIZE;
@@ -247,14 +255,14 @@ static void Oscilloscope_SendFrames(sFrameData_t *const frame_data, char *const 
     for (size_t frame = 0; frame < complete_frames; frame++) {
         message.data = (char *) &frame_data->data[frame * FRAME_SIZE];
 
-        UART_API_Send(UART0, message, UART_TX_TIMEOUT);
+        Transport_API_Send(message, TX_TIMEOUT);
     }
 
     if (partial_bytes > 0) {
         message.data = (char *) &frame_data->data[complete_frames * FRAME_SIZE];
         message.size = partial_bytes;
 
-        UART_API_Send(UART0, message, UART_TX_TIMEOUT);
+        Transport_API_Send(message, TX_TIMEOUT);
     }
 
     frame_data->frame_number++;
@@ -285,6 +293,47 @@ static void Oscilloscope_CaptureNotifyCallback(const eCaptureDevice_t device, co
 
 static void Oscilloscope_FrameTimerCallback(TimerHandle_t timer) {
     xEventGroupSetBits(g_event, FRAME_DONE_EVENT);
+}
+
+static void Oscilloscope_ConnectWifi(void) {
+    if (!Wifi_API_Connect(NULL, NULL)) {
+        TRACE_ERR("HandleUsbDetectEvent: Failed to connect to WiFi\n");
+
+        return;
+    }
+
+    if (!LED_API_BlinkCount(eLed_Led, LED_BLINK_FOREVER, CONNECTING_BLINK_FREQUENCY_HZ)) {
+        TRACE_ERR("HandleUsbDetectEvent: Failed to start LED blinking\n");
+    }
+
+    eWifiState_t wifi_state = eWifiState_Default;
+
+    while (eWifiState_Ready != wifi_state) {
+        wifi_state = Wifi_API_GetStatus();
+
+        if (eWifiState_Disconnected == wifi_state) {
+            TRACE_ERR("HandleUsbDetectEvent: WiFi disconnected while waiting for connection\n");
+            LED_API_StopBlink(eLed_Led);
+            LED_API_TurnOff(eLed_Led);
+
+            return;
+        }
+
+        if (eOscilloscopeState_Initialized <= g_oscilloscope_state) {
+            vTaskDelay(pdMS_TO_TICKS(100));
+        }
+    }
+
+    if (!LED_API_StopBlink(eLed_Led)) {
+        TRACE_ERR("HandleUsbDetectEvent: Failed to stop LED blinking\n");
+    }
+
+    LED_API_TurnOff(eLed_Led);
+
+    if (!LED_API_BlinkCount(eLed_Led, CONNECTED_BLINK_TIMES, CONNECTED_BLINK_FREQUENCY_HZ)) {
+        TRACE_ERR("HandleUsbDetectEvent: Failed to start LED blinking\n");
+    }
+    LED_API_TurnOff(eLed_Led);
 }
 
 /**********************************************************************************************************************
@@ -358,6 +407,17 @@ bool Oscilloscope_APP_Init(void) {
         TRACE_ERR("Init: Failed to create thread\n");
 
         return false;
+    }
+
+    // Workaround to start in UDP mode, till get HW fixed and use dynamic transport mode selection based on USB state
+    if (DEFAULT_TRANSPORT_MODE == eTransport_WiFi_UDP) {
+        Oscilloscope_ConnectWifi();
+
+        if (!Transport_API_SetMode(eTransport_WiFi_UDP)) {
+            TRACE_ERR("Init: Failed to set transport mode\n");
+
+            return false;
+        }
     }
 
     if (!IO_API_Start()) {
