@@ -1,13 +1,17 @@
-#ifndef SOURCE_APP_CLI_CMD_HANDLERS_H_
-#define SOURCE_APP_CLI_CMD_HANDLERS_H_
+#ifndef SOURCE_API_UDP_API_H_
+#define SOURCE_API_UDP_API_H_
 /**********************************************************************************************************************
  * Includes
  *********************************************************************************************************************/
 
 #include "framework_config.h"
 
-#if defined(ENABLE_DEFAULT_CMD)
-#include "cmd_api.h"
+#if defined(ENABLE_UDP)
+#include <stdbool.h>
+#include <stdint.h>
+#include <stddef.h>
+#include "transport_config.h"
+#include "message.h"
 
 /**********************************************************************************************************************
  * Exported definitions and macros
@@ -17,49 +21,18 @@
  * Exported types
  *********************************************************************************************************************/
 
-/* clang-format off */
-typedef enum eCliDefaultCmd {
-    eCliDefaultCmd_First = 0,
-    
-#if defined(ENABLE_LED)
-    eCliDefaultCmd_Led_Set,
-    eCliDefaultCmd_Led_Reset,
-    eCliDefaultCmd_Led_Toggle,
-    eCliDefaultCmd_Led_BlinkCount,
-    eCliDefaultCmd_Led_BlinkDuration,
-    eCliDefaultCmd_Led_StopBlink,
-#endif /* ENABLE_LED */
-    
-#if defined(ENABLE_PWM_LED)
-    eCliDefaultCmd_Pwm_LedSetBrightness,
-    eCliDefaultCmd_Pwm_LedPulse,
-#endif /* ENABLE_PWM_LED */
-
-#if defined(ENABLE_WIFI)
-    eCliCustomCmd_WifiConnect,
-    eCliCustomCmd_WifiDisconnect,
-    eCliCustomCmd_WifiStatus,
-#endif /* ENABLE_WIFI */
-
-#if defined(ENABLE_UDP)
-    eCliCustomCmd_UdpSetTarget,
-#endif /* ENABLE_UDP */
-
-    eCliDefaultCmd_RgbToHsv,
-    eCliDefaultCmd_HsvToRgb,
-    eCliDefaultCmd_Last
-} eCliDefaultCmd_t;
-/* clang-format on */
-
 /**********************************************************************************************************************
  * Exported variables
  *********************************************************************************************************************/
-
-extern sCmdDesc_t g_default_cmd_lut[eCliDefaultCmd_Last];
 
 /**********************************************************************************************************************
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-#endif /* ENABLE_DEFAULT_CMD */
-#endif /* SOURCE_APP_DEFAULT_CLI_LUT_H_ */
+bool UDP_API_Init(const eUdp_t udp);
+bool UDP_API_SetTarget(const eUdp_t udp, const uIPv4Address_t address, const uint16_t port);
+bool UDP_API_Send(const eUdp_t udp, const sMessage_t message, const uint32_t timeout);
+bool UDP_API_Receive(const eUdp_t udp, sMessage_t *message, const uint32_t timeout);
+
+#endif /* ENABLE_UDP */
+#endif /* SOURCE_API_UDP_API_H_ */

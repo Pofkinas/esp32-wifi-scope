@@ -25,6 +25,11 @@
 #include "wifi_config.h"
 #endif /* ENABLE_WIFI */
 
+#if defined(ENABLE_UDP)
+#include "udp_api.h"
+#include "transport_config.h"
+#endif /* ENABLE_UDP */
+
 /**********************************************************************************************************************
  * Private definitions and macros
  *********************************************************************************************************************/
@@ -60,6 +65,10 @@ CREATE_MODULE_NAME_EMPTY
 #if defined(ENABLE_LED)
 static eErrorCode_t CLI_CMD_Led_Common(sMessage_t arguments, sMessage_t *response, const eLedTask_t task);
 #endif /* ENABLE_LED */
+
+#if defined(ENABLE_UDP)
+static eErrorCode_t Custom_CLI_CMD_ParseIP(sMessage_t *arguments, sMessage_t *response, uIPv4Address_t *ip_address);
+#endif /* ENABLE_UDP */
 
 /**********************************************************************************************************************
  * Definitions of private functions
@@ -129,6 +138,61 @@ static eErrorCode_t CLI_CMD_Led_Common(sMessage_t arguments, sMessage_t *respons
     return eErrorCode_OK;
 }
 #endif /* ENABLE_LED */
+
+#if defined(ENABLE_UDP)
+static eErrorCode_t Custom_CLI_CMD_ParseIP(sMessage_t *arguments, sMessage_t *response, uIPv4Address_t *ip_address) {
+    if (NULL == arguments) {
+        TRACE_ERR("Invalid arguments pointer\n");
+
+        return eErrorCode_NULLPTR;
+    }
+
+    if (NULL == arguments->data) {
+        TRACE_ERR("Invalid arguments data pointer\n");
+
+        return eErrorCode_NULLPTR;
+    }
+
+    if (NULL == response) {
+        TRACE_ERR("Invalid data pointer\n");
+
+        return eErrorCode_NULLPTR;
+    }
+
+    if (NULL == response->data) {
+        TRACE_ERR("Invalid response data pointer\n");
+
+        return eErrorCode_NULLPTR;
+    }
+
+    if (NULL == ip_address) {
+        TRACE_ERR("Invalid IP address pointer\n");
+
+        return eErrorCode_NULLPTR;
+    }
+
+    size_t octets[4] = {0};
+    eErrorCode_t error = eErrorCode_OK;
+
+    for (size_t i = 0; i < 4; i++) {
+        error = CMD_Parser_FindNextArgUInt(arguments, &octets[i], IP_SEPARATOR, IP_SEPARATOR_LENGTH, response);
+
+        if (eErrorCode_OK != error) {
+            return error;
+        }
+
+        if (octets[i] > UINT8_MAX) {
+            snprintf(response->data, response->size, "%d: Incorrect octet value\n", octets[i]);
+
+            return eErrorCode_INVAL;
+        }
+
+        ip_address->octets[i] = (uint8_t) octets[i];
+    }
+
+    return eErrorCode_OK;
+}
+#endif /* ENABLE_UDP */
 
 /**********************************************************************************************************************
  * Definitions of exported functions
@@ -652,6 +716,95 @@ eErrorCode_t Custom_CLI_CMD_WifiStatus(sMessage_t arguments, sMessage_t *respons
     return eErrorCode_OK;
 }
 #endif /* ENABLE_WIFI */
+
+#if defined(ENABLE_UDP)
+eErrorCode_t Custom_CLI_CMD_UdpSetTarget(sMessage_t arguments, sMessage_t *response) {
+    if ((NULL == response) || (NULL == response->data)) {
+        TRACE_ERR("Invalid response pointer\n");
+
+        return eErrorCode_NULLPTR;
+    }
+
+    char *separator_ptr = NULL;
+
+    size_t socket_num = 0;
+    size_t port_num = 0;
+
+    eUdp_t socket = 0;
+    uIPv4Address_t ip_address = {0};
+
+    eErrorCode_t error = eErrorCode_OK;
+
+    error = CMD_Parser_FindNextArgUInt(&arguments, &socket_num, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+
+    if (eErrorCode_OK != error) {
+        return error;
+    }
+
+    error = CMD_Parser_ParseToken(&separator_ptr, &arguments, CMD_SEPARATOR, response);
+
+    if (eErrorCode_OK != error) {
+        return error;
+    }
+
+    sMessage_t ip_arguments = arguments;
+
+    if (NULL != separator_ptr) {
+        ip_arguments.size = (size_t) (separator_ptr - arguments.data);
+    }
+
+    error = Custom_CLI_CMD_ParseIP(&ip_arguments, response, &ip_address);
+
+    if (eErrorCode_OK != error) {
+        return error;
+    }
+
+    if (NULL == separator_ptr) {
+        snprintf(response->data, response->size, "Missing port\n");
+
+        return eErrorCode_ARGFEW;
+    }
+
+    arguments.size -= (separator_ptr - arguments.data + CMD_SEPARATOR_LENGTH);
+    arguments.data = separator_ptr + CMD_SEPARATOR_LENGTH;
+
+    error = CMD_Parser_FindNextArgUInt(&arguments, &port_num, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+
+    if (eErrorCode_OK != error) {
+        return error;
+    }
+
+    if (0 != arguments.size) {
+        snprintf(response->data, response->size, "Too many arguments\n");
+
+        return eErrorCode_ARGMANY;
+    }
+
+    socket = (eUdp_t) socket_num;
+
+    if (port_num > UINT16_MAX) {
+        snprintf(response->data, response->size, "Port out of range\n");
+
+        return eErrorCode_RANGE;
+    }
+
+    if (!UDP_Config_IsCorrectUdp(socket)) {
+        snprintf(response->data, response->size, "%d: Incorrect UDP socket\n", socket);
+
+        return eErrorCode_INVAL;
+    }
+
+    if (!UDP_API_SetTarget(socket, ip_address, (uint16_t) port_num)) {
+        snprintf(response->data, response->size, "Failed to set UDP target\n");
+
+        return eErrorCode_FAILED;
+    }
+
+    snprintf(response->data, response->size, "Operation successful\n");
+
+    return eErrorCode_OK;
+}
+#endif /* ENABLE_UDP */
 
 eErrorCode_t CLI_CMD_Led_RgbToHsv(sMessage_t arguments, sMessage_t *response) {
     if (NULL == response) {

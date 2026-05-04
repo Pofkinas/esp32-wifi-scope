@@ -47,6 +47,10 @@ eErrorCode_t Custom_CLI_CMD_WifiDisconnect(sMessage_t arguments, sMessage_t *res
 eErrorCode_t Custom_CLI_CMD_WifiStatus(sMessage_t arguments, sMessage_t *response);
 #endif /* ENABLE_WIFI */
 
+#if defined(ENABLE_UDP)
+eErrorCode_t Custom_CLI_CMD_UdpSetTarget(sMessage_t arguments, sMessage_t *response);
+#endif /* ENABLE_UDP */
+
 eErrorCode_t CLI_CMD_Led_RgbToHsv(sMessage_t arguments, sMessage_t *response);
 eErrorCode_t CLI_CMD_Led_HsvToRgb(sMessage_t arguments, sMessage_t *response);
 

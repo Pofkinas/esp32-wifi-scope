@@ -96,6 +96,15 @@ sCmdDesc_t g_default_cmd_lut[eCliDefaultCmd_Last] = {
         /* e. g. wifi_status */
     },
 #endif /* ENABLE_WIFI */
+
+#if defined(ENABLE_UDP)
+    [eCliCustomCmd_UdpSetTarget] = {
+        DEFINE_CMD("udp_set_target:"),
+        .handler = Custom_CLI_CMD_UdpSetTarget
+        /* e. g. udp_set_target:<eUdp_t>, <ip_address>, <port> */
+    },
+#endif /* ENABLE_UDP */
+
     [eCliDefaultCmd_RgbToHsv] = {
         DEFINE_CMD("rgb:"),
         .handler = CLI_CMD_Led_RgbToHsv

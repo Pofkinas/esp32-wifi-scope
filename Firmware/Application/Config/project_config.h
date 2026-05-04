@@ -55,6 +55,9 @@
 /// Utilities
 #define ENABLE_COLOUR
 
+/// Transport protocols
+#define ENABLE_UDP
+
 /// Misc
 #define ENABLE_CAPTURE
 #define ENABLE_VOLTAGE
@@ -87,6 +90,9 @@
 
 #define OSCILLOSCOPE_THREAD_STACK_SIZE (256 * 36)
 #define OSCILLOSCOPE_THREAD_PRIORITY eTaskPriority_Normal
+
+#define UDP_API_THREAD_STACK_SIZE (256 * 8)
+#define UDP_API_THREAD_PRIORITY eTaskPriority_Normal
 
 //=============================================================================
 // UART CONFIGURATION
@@ -164,6 +170,7 @@
 #define DEBUG_LED_API
 #define DEBUG_CAPTURE_API
 #define DEBUG_WIFI_API
+#define DEBUG_UDP_API
 
 //=============================================================================
 // MISCELLANEOUS
