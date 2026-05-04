@@ -23,6 +23,7 @@ typedef enum eGpio {
     eGpio_First = 0,
     eGpio_Led = eGpio_First,
     eGpio_Button,
+    eGpio_UsbDetect,
     eGpio_Last
 } eGpio_t;
 

@@ -24,6 +24,8 @@
 
 #define BUTTON_TRIGGERED_EVENT 0x01U
 #define BUTTON_DEBOUNCE_MS 1U
+#define USB_DETECT_TRIGGERED_EVENT 0x02U
+#define USB_DETECT_DEBOUNCE_MS 50U
 
 /**********************************************************************************************************************
  * Exported types
@@ -32,6 +34,7 @@
 typedef enum eIo {
     eIo_First = 0,
     eIo_Button = eIo_First,
+    eIo_UsbDetect,
     eIo_Last
 } eIo_t;
 

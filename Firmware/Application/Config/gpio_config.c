@@ -29,6 +29,12 @@ static const sGpioDesc_t g_static_gpio_lut[eGpio_Last] = {
         .mode = GPIO_MODE_INPUT,
         .pull_up = GPIO_PULLUP_DISABLE,
         .pull_down = GPIO_PULLDOWN_DISABLE,
+    },
+    [eGpio_UsbDetect] = {
+        .gpio_num = GPIO_NUM_7,
+        .mode = GPIO_MODE_INPUT,
+        .pull_up = GPIO_PULLUP_DISABLE,
+        .pull_down = GPIO_PULLDOWN_DISABLE,
     }
 };
 /* clang-format on */

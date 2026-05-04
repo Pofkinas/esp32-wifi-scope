@@ -47,6 +47,8 @@
 #define CAPTURE_DEVICE eCaptureDevice_Adc1ch0
 #define EVENT_ALL_BITS ((EventBits_t) 0x00FFFFFFU)
 #define START_STOP_EVENT BUTTON_TRIGGERED_EVENT
+#define USB_DETECT_EVENT USB_DETECT_TRIGGERED_EVENT
+
 #define DEFAULT_TRANSPORT_MODE eTransport_WiFi_UDP
 
 /**********************************************************************************************************************
@@ -75,6 +77,7 @@ typedef struct sFrameData {
 
 static void Oscilloscope_Thread(void *pvParameters);
 static void Oscilloscope_HandleStartStopEvent(void);
+static void Oscilloscope_HandleUsbDetectEvent(void);
 static void Oscilloscope_HandleCaptureDoneEvent(void);
 static void Oscilloscope_SendFrames(sFrameData_t *const frame_data, char *const header);
 
@@ -159,6 +162,12 @@ static void Oscilloscope_Thread(void *pvParameters) {
             continue;
         }
 
+        if (USB_DETECT_EVENT & event) {
+            Oscilloscope_HandleUsbDetectEvent();
+
+            continue;
+        }
+
         if (DATA_OVERFLOW_EVENT & event) {
             TRACE_WRN("Data overflow event received\n");
 
@@ -202,6 +211,38 @@ static void Oscilloscope_HandleStartStopEvent(void) {
     }
 
     TRACE_INFO("Button pressed!\n");
+}
+
+static void Oscilloscope_HandleUsbDetectEvent(void) {
+    bool is_usb_connected = false;
+
+    if (!IO_API_ReadPinState(eIo_UsbDetect, &is_usb_connected)) {
+        return;
+    }
+
+    if (eOscilloscopeState_Running == g_oscilloscope_state) {
+        if (!Oscilloscope_APP_Stop()) {
+            TRACE_ERR("HandleUsbDetectEvent: Failed to stop oscilloscope app\n");
+        }
+
+        TRACE_INFO("Oscilloscope stopped due to USB state change\n");
+    }
+
+    if (!is_usb_connected) { // Inverted logic because of active low
+        TRACE_INFO("USB connected\n");
+
+        Wifi_API_Disconnect();
+        Transport_API_SetMode(eTransport_UART);
+
+        return;
+    }
+
+    TRACE_INFO("USB disconnected\n");
+
+    Oscilloscope_ConnectWifi();
+    Transport_API_SetMode(eTransport_WiFi_UDP);
+
+    return;
 }
 
 static void Oscilloscope_HandleCaptureDoneEvent(void) {
@@ -365,6 +406,12 @@ bool Oscilloscope_APP_Init(void) {
         return false;
     }
 
+    if (!IO_API_Init(eIo_UsbDetect, g_event)) {
+        TRACE_ERR("Init: IO_API_Init failed for USB detect\n");
+
+        return false;
+    }
+
     g_capture_buffer = Ring_Buffer_Init(CAPTURE_BUFFER_SIZE, g_adc1ch0_capture.data_size);
 
     if (NULL == g_capture_buffer) {
@@ -409,16 +456,7 @@ bool Oscilloscope_APP_Init(void) {
         return false;
     }
 
-    // Workaround to start in UDP mode, till get HW fixed and use dynamic transport mode selection based on USB state
-    if (DEFAULT_TRANSPORT_MODE == eTransport_WiFi_UDP) {
-        Oscilloscope_ConnectWifi();
-
-        if (!Transport_API_SetMode(eTransport_WiFi_UDP)) {
-            TRACE_ERR("Init: Failed to set transport mode\n");
-
-            return false;
-        }
-    }
+    Oscilloscope_HandleUsbDetectEvent();
 
     if (!IO_API_Start()) {
         TRACE_ERR("Init: IO_API_Start failed\n");

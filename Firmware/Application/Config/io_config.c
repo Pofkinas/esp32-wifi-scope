@@ -21,6 +21,10 @@ static const sExtiDesc_t g_static_exti_lut[eIo_Last] = {
     [eIo_Button] = {
         .gpio_num = GPIO_NUM_21,
         .trigger_interrupt = GPIO_INTR_NEGEDGE
+    },
+    [eIo_UsbDetect] = {
+        .gpio_num = GPIO_NUM_7,
+        .trigger_interrupt = GPIO_INTR_ANYEDGE
     }
 };
 
@@ -32,6 +36,16 @@ static const sIoDesc_t g_static_io_desc_lut[eIo_Last] = {
         .is_debounce_enable = true,
         .debounce_period_ms = BUTTON_DEBOUNCE_MS,
         .debounce_timer_name = "Button_Debounce",
+        .is_exti = true,
+        .default_press_period_ms = 50
+    },
+    [eIo_UsbDetect] = {
+        .gpio_pin = eGpio_UsbDetect,
+        .active_state = eActiveState_Both,
+        .triggered_flag = USB_DETECT_TRIGGERED_EVENT,
+        .is_debounce_enable = true,
+        .debounce_period_ms = USB_DETECT_DEBOUNCE_MS,
+        .debounce_timer_name = "UsbDetect_Debounce",
         .is_exti = true,
         .default_press_period_ms = 50
     }
