@@ -8,20 +8,24 @@ import numpy as np
 import serial
 import serial.tools.list_ports
 
-from frame_reader import SerialFrameReader
+from frame_reader import SerialFrameReader, WirelessFrameReader
 from scope_plot import ScopePlot
 
 
 @dataclass
 class Config:
-    ADC_SAMPLE_HZ:      int   = 60000       # 60 KSps
-    DEFAULT_BAUD:       int   = 1000000
-    TIMEBASE_MIN:       float = 1e-6        # 1 µs/div
-    TIMEBASE_MAX:       float = 5.0         # 5 s/div
+    ADC_SAMPLE_HZ:      int   = 50000
+    DEFAULT_BAUD:       int   = 2000000
+    UDP_HOST:           str   = '0.0.0.0'
+    UDP_DEFAULT_PORT:   int   = 4210
+    UDP_CMD_HOST:       str   = '192.168.0.100'
+    UDP_CMD_PORT:       int   = 4210
+    TIMEBASE_MIN:       float = 1e-6
+    TIMEBASE_MAX:       float = 5.0
     VOLTAGE_MIN:        float = 0.0
     VOLTAGE_MAX:        float = 3300.0
-    VOLTAGE_SLIDER_MAX: float = 5000.0
-    BUFFER_MAX:         int   = 10485760    # 10 MB
+    VOLTAGE_SLIDER_MAX: float = 3500.0
+    BUFFER_MAX:         int   = 10485760 # 10 MB worth of samples
     CMD_SCOPE_START:    str   = 'scope_start'
     CMD_SCOPE_STOP:     str   = 'scope_stop'
 
@@ -35,10 +39,8 @@ class SampleBuffer:
     def push(self, samples):
         space = self.target - self._count
         take  = max(0, min(len(samples), space))
-
         self._data[self._count:self._count + take] = samples[:take]
         self._count += take
-
         return self._count >= self.target
 
     def view(self):
@@ -53,7 +55,7 @@ class OscilloscopeApp:
         self._root   = root
         self._cfg    = cfg
         self._queue  = queue.Queue()
-        self._reader = SerialFrameReader(debug=lambda msg: self._queue.put(('debug', msg)))
+        self._reader = None
         self._buffer = SampleBuffer(cfg.BUFFER_MAX)
 
         self._paused        = False
@@ -65,8 +67,8 @@ class OscilloscopeApp:
         root.title("ESP32 Oscilloscope")
         root.configure(bg='#1e1e1e')
 
+        self._init_connection_bar()
         self._plot = ScopePlot(root, cfg, on_cursor_move=self._cursor_moved, on_delta_move=self._delta_moved)
-
         self._init_controls()
         self._init_debug_panel()
 
@@ -114,23 +116,78 @@ class OscilloscopeApp:
         self._delta_readout = tk.Label(ctrl, text="", width=10, bg='#2a2a2a', fg='#ff9800', font=('Courier', 9), justify='left')
         self._delta_readout.pack(side=tk.LEFT, padx=(0, 8))
 
-        tk.Label(ctrl, text="Port:", **lbl).pack(side=tk.LEFT, padx=(16, 2))
+    def _init_connection_bar(self):
+        lbl = dict(bg='#2a2a2a', fg='white')
+        ent = dict(bg='#1e1e1e', fg='white', relief=tk.FLAT, insertbackground='white')
 
+        conn_bar = tk.Frame(self._root, bg='#2a2a2a')
+        conn_bar.pack(fill=tk.X, padx=4, pady=2)
+
+        tk.Label(conn_bar, text="Mode:", **lbl).pack(side=tk.LEFT, padx=(4, 2))
+
+        self._mode_var = tk.StringVar(value='UART')
+        mode_combo = ttk.Combobox(conn_bar, textvariable=self._mode_var, values=['UART', 'UDP'],
+                                  width=5, state='readonly')
+        mode_combo.pack(side=tk.LEFT, padx=(0, 6))
+        mode_combo.bind('<<ComboboxSelected>>', self._mode_changed)
+
+        # UART widgets (visible by default)
+        self._uart_section = tk.Frame(conn_bar, bg='#2a2a2a')
+        tk.Label(self._uart_section, text="Port:", **lbl).pack(side=tk.LEFT, padx=(0, 2))
         self._port_var   = tk.StringVar()
-        self._port_combo = ttk.Combobox(ctrl, textvariable=self._port_var, width=10)
+        self._port_combo = ttk.Combobox(self._uart_section, textvariable=self._port_var, width=10)
         self._port_combo.pack(side=tk.LEFT)
+        self._uart_section.pack(side=tk.LEFT)
 
-        self._conn_btn = tk.Button(ctrl, text="Connect", command=self._connect_toggle, bg='#4a1a1a', fg='#ff6b6b', relief=tk.FLAT, padx=8)
+        # UDP widgets (hidden until UDP mode selected)
+        self._udp_section = tk.Frame(conn_bar, bg='#2a2a2a')
+
+        tk.Label(self._udp_section, text="Listening:", **lbl).pack(side=tk.LEFT, padx=(0, 2))
+        self._udp_host_var = tk.StringVar(value=self._cfg.UDP_HOST)
+        tk.Entry(self._udp_section, textvariable=self._udp_host_var, width=11, **ent).pack(side=tk.LEFT)
+        tk.Label(self._udp_section, text="Port:", **lbl).pack(side=tk.LEFT, padx=(4, 2))
+        self._udp_port_var = tk.StringVar(value=str(self._cfg.UDP_DEFAULT_PORT))
+        tk.Entry(self._udp_section, textvariable=self._udp_port_var, width=6, **ent).pack(side=tk.LEFT)
+
+        tk.Label(self._udp_section, text="Cmd host:", **lbl).pack(side=tk.LEFT, padx=(12, 2))
+        self._udp_cmd_host_var = tk.StringVar(value=self._cfg.UDP_CMD_HOST)
+        tk.Entry(self._udp_section, textvariable=self._udp_cmd_host_var, width=13, **ent).pack(side=tk.LEFT)
+        tk.Label(self._udp_section, text="Port:", **lbl).pack(side=tk.LEFT, padx=(4, 2))
+        self._udp_cmd_port_var = tk.StringVar(value=str(self._cfg.UDP_CMD_PORT))
+        tk.Entry(self._udp_section, textvariable=self._udp_cmd_port_var, width=6, **ent).pack(side=tk.LEFT)
+
+        self._conn_btn = tk.Button(conn_bar, text="Connect", command=self._connect_toggle,
+                                   bg='#4a1a1a', fg='#ff6b6b', relief=tk.FLAT, padx=8)
         self._conn_btn.pack(side=tk.LEFT, padx=4)
 
         self._ports_refresh()
+
+    def _mode_changed(self, _event=None):
+        if self._reader and self._reader.connected:
+            self._debug_log('[WARN] Disconnect before switching mode')
+            self._mode_var.set('UART' if isinstance(self._reader, SerialFrameReader) else 'UDP')
+            return
+
+        # Unpack connect button first, then swap sections, then repack button last
+        # so the order is always: [mode combo] [active section] [Connect]
+        self._conn_btn.pack_forget()
+
+        if self._mode_var.get() == 'UDP':
+            self._uart_section.pack_forget()
+            self._udp_section.pack(side=tk.LEFT)
+        else:
+            self._udp_section.pack_forget()
+            self._uart_section.pack(side=tk.LEFT)
+
+        self._conn_btn.pack(side=tk.LEFT, padx=4)
 
     def _init_debug_panel(self):
         frame = tk.Frame(self._root, bg='#1e1e1e')
         frame.pack(fill=tk.X, padx=4, pady=(0, 4))
 
         sb = ttk.Scrollbar(frame)
-        self._debug = tk.Text(frame, height=5, state=tk.DISABLED, bg='#111', fg='#888', font=('Courier', 9), yscrollcommand=sb.set, relief=tk.FLAT)
+        self._debug = tk.Text(frame, height=5, state=tk.DISABLED, bg='#111', fg='#888',
+                              font=('Courier', 9), yscrollcommand=sb.set, relief=tk.FLAT)
         sb.config(command=self._debug.yview)
         sb.pack(side=tk.RIGHT, fill=tk.Y)
         self._debug.pack(fill=tk.X)
@@ -139,11 +196,13 @@ class OscilloscopeApp:
         cmd_row.pack(fill=tk.X, padx=4, pady=(0, 4))
 
         self._cmd_var = tk.StringVar()
-        cmd_entry = tk.Entry(cmd_row, textvariable=self._cmd_var, bg='#1e1e1e', fg='white', relief=tk.FLAT, insertbackground='white', font=('Courier', 9))
+        cmd_entry = tk.Entry(cmd_row, textvariable=self._cmd_var, bg='#1e1e1e', fg='white',
+                             relief=tk.FLAT, insertbackground='white', font=('Courier', 9))
         cmd_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 4))
         cmd_entry.bind('<Return>', self._command_send)
 
-        tk.Button(cmd_row, text="Send", command=self._command_send, bg='#3a3a3a', fg='white', relief=tk.FLAT, padx=8).pack(side=tk.LEFT)
+        tk.Button(cmd_row, text="Send", command=self._command_send,
+                  bg='#3a3a3a', fg='white', relief=tk.FLAT, padx=8).pack(side=tk.LEFT)
 
     def _ports_refresh(self):
         ports = [p.device for p in serial.tools.list_ports.comports()]
@@ -153,46 +212,85 @@ class OscilloscopeApp:
             self._port_var.set(ports[0])
 
     def _connect_toggle(self):
-        if self._reader.connected:
+        if self._reader and self._reader.connected:
             self._disconnect()
         else:
             self._connect()
 
     def _connect(self):
-        self._ports_refresh()
+        mode = self._mode_var.get()
 
-        port = self._port_var.get()
+        if mode == 'UDP':
+            try:
+                udp_port = int(self._udp_port_var.get())
+            except ValueError:
+                messagebox.showerror("Invalid Port", "Enter a valid UDP port number.")
+                return
 
-        if not port:
-            messagebox.showwarning("No Port", "Select a serial port first.")
-            return
+            cmd_host = self._udp_cmd_host_var.get().strip()
+            cmd_port_text = self._udp_cmd_port_var.get().strip()
+            cmd_port = None
 
-        try:
-            self._reader.connect(port, self._cfg.DEFAULT_BAUD)
-        except serial.SerialException as e:
-            messagebox.showerror("Connection Failed", str(e))
-            return
+            if cmd_port_text:
+                try:
+                    cmd_port = int(cmd_port_text)
+                except ValueError:
+                    messagebox.showerror("Invalid Cmd Port", "Enter a valid command port number.")
+                    return
+
+            if not cmd_host:
+                cmd_port = None
+
+            udp_host = self._udp_host_var.get().strip() or self._cfg.UDP_HOST
+            self._reader = WirelessFrameReader(debug=lambda msg: self._queue.put(('debug', msg)))
+
+            try:
+                self._reader.connect(udp_host, udp_port, cmd_host=cmd_host or None, cmd_port=cmd_port)
+            except OSError as e:
+                messagebox.showerror("UDP Bind Failed", str(e))
+                self._reader = None
+                return
+
+            self._debug_log(f'[UDP] Listening on {udp_host}:{udp_port}')
+        else:
+            self._ports_refresh()
+            port = self._port_var.get()
+
+            if not port:
+                messagebox.showwarning("No Port", "Select a serial port first.")
+                return
+
+            self._reader = SerialFrameReader(debug=lambda msg: self._queue.put(('debug', msg)))
+
+            try:
+                self._reader.connect(port, self._cfg.DEFAULT_BAUD)
+            except serial.SerialException as e:
+                messagebox.showerror("Connection Failed", str(e))
+                self._reader = None
+                return
 
         self._stop.clear()
-
+        self._start_hint_shown = False
         threading.Thread(target=self._reader_thread, daemon=True).start()
-
         self._conn_btn.config(text="Disconnect", bg='#1a4a1a', fg='#00e676')
 
     def _disconnect(self):
         self._stop.set()
 
         if self._scope_running:
-            self._reader.send(self._cfg.CMD_SCOPE_STOP)
+            if self._reader:
+                self._reader.send(self._cfg.CMD_SCOPE_STOP)
             self._scope_running = False
             self._scope_btn.config(text="Start", bg='#1a4a1a', fg='#00e676')
 
-        self._reader.disconnect()
+        if self._reader:
+            self._reader.disconnect()
+            self._reader = None
 
         self._conn_btn.config(text="Connect", bg='#4a1a1a', fg='#ff6b6b')
 
     def _scope_toggle(self):
-        if not self._reader.connected:
+        if not (self._reader and self._reader.connected):
             self._debug_log('[WARN] Not connected')
             return
 
@@ -215,13 +313,11 @@ class OscilloscopeApp:
 
     def _cursor_toggle(self):
         active = not self._plot.cursor_active
-
         self._plot.cursor_set_active(active)
         self._cursor_btn.config(fg='#ffff00' if active else 'white')
 
     def _delta_toggle(self):
         active = not self._plot.delta_active
-
         self._plot.delta_set_active(active)
         self._delta_btn.config(fg='#ff9800' if active else 'white')
 
@@ -239,10 +335,8 @@ class OscilloscopeApp:
         dt_s   = dt_ms / 1000
         hz     = (1.0 / dt_s) if dt_s > 0 else 0
         hz_str = f"{hz / 1000:.3g} kHz" if hz >= 1000 else f"{hz:.3g} Hz"
-
-        scale      = {'µs': (dt_ms * 1000, 'µs'), 'ms': (dt_ms, 'ms'), 's': (dt_s, 's')}
-        val, unit  = scale[self._tb_unit]
-
+        scale  = {'µs': (dt_ms * 1000, 'µs'), 'ms': (dt_ms, 'ms'), 's': (dt_s, 's')}
+        val, unit = scale[self._tb_unit]
         self._delta_readout.config(text=f"{val:.4g} {unit}\n{hz_str}")
 
     def _timebase_changed(self, val):
@@ -284,8 +378,12 @@ class OscilloscopeApp:
 
                 if frame:
                     self._queue.put(('frame', frame))
-            except serial.SerialException as e:
-                self._queue.put(('debug', f'[ERROR] {e}'))
+            except (serial.SerialException, OSError) as e:
+                if not self._stop.is_set():
+                    self._queue.put(('debug', f'[ERROR] {e}'))
+                break
+            except Exception as e:
+                self._queue.put(('debug', f'[ERROR] {type(e).__name__}: {e}'))
                 break
 
     def _queue_poll(self):
@@ -293,16 +391,24 @@ class OscilloscopeApp:
             while True:
                 kind, data = self._queue.get_nowait()
 
-                if kind == 'frame' and not self._paused:
-                    if self._buffer.push(data.samples):
-                        self._plot.redraw(self._buffer.view(), self._cfg.ADC_SAMPLE_HZ)
-                        self._buffer.reset()
+                if kind == 'frame':
+                    if not self._scope_running:
+                        if not getattr(self, '_start_hint_shown', False):
+                            self._debug_log('[INFO] Frames arriving – click Start to display')
+                            self._start_hint_shown = True
+                    elif not self._paused:
+                        if self._buffer.push(data.samples):
+                            try:
+                                self._plot.redraw(self._buffer.view(), self._cfg.ADC_SAMPLE_HZ)
+                            except Exception as e:
+                                self._debug_log(f'[ERROR] redraw: {e}')
+                            self._buffer.reset()
                 elif kind == 'debug':
                     self._debug_log(data)
         except queue.Empty:
             pass
-
-        self._root.after(20, self._queue_poll)
+        finally:
+            self._root.after(20, self._queue_poll)
 
     def _debug_log(self, msg):
         self._debug.config(state=tk.NORMAL)
@@ -316,7 +422,7 @@ class OscilloscopeApp:
         if not cmd:
             return
 
-        if not self._reader.connected:
+        if not (self._reader and self._reader.connected):
             self._debug_log('[WARN] Not connected')
             return
 
