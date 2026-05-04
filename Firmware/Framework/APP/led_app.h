@@ -28,7 +28,9 @@ typedef enum eLedTask {
     eLedTask_Set,
     eLedTask_Reset,
     eLedTask_Toggle,
-    eLedTask_Blink,
+    eLedTask_BlinkCount,
+    eLedTask_BlinkDuration,
+    eLedTask_StopBlink,
     #endif /* ENABLE_LED */
 
     #if defined(ENABLE_PWM_LED)
@@ -39,6 +41,7 @@ typedef enum eLedTask {
     eLedTask_Last
 } eLedTask_t;
 
+#if defined(ENABLE_LED)
 typedef struct sLedCommandDesc {
     eLedTask_t task;
     void *data;
@@ -48,12 +51,17 @@ typedef struct sLedCommon {
     eLed_t led;
 } sLedCommon_t;
 
-#if defined(ENABLE_LED)
-typedef struct sLedBlink {
+typedef struct sLedBlinkCount {
     eLed_t led;
-    size_t blink_time;
-    uint16_t blink_frequency;
-} sLedBlink_t;
+    uint16_t total_blinks;
+    uint16_t blink_frequency_hz;
+} sLedBlinkCount_t;
+
+typedef struct sLedBlinkDuration {
+    eLed_t led;
+    size_t blink_time_ms;
+    uint16_t blink_frequency_hz;
+} sLedBlinkDuration_t;
 #endif /* ENABLE_LED */
 
 #if defined(ENABLE_PWM_LED)

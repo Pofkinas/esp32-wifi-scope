@@ -9,13 +9,16 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
-#include "led_app.h"
-#include "cmd_parser.h"
-#include "heap_api.h"
-#include "led_api.h"
 #include "debug_api.h"
-#include "led_config.h"
+#include "heap_api.h"
+#include "cmd_parser.h"
 #include "colour.h"
+
+#if defined(ENABLE_LED)
+#include "led_app.h"
+#include "led_api.h"
+#include "led_config.h"
+#endif /* ENABLE_LED */
 
 /**********************************************************************************************************************
  * Private definitions and macros
@@ -145,7 +148,7 @@ eErrorCode_t CLI_CMD_Led_Toggle(sMessage_t arguments, sMessage_t *response) {
     return CLI_CMD_Led_Common(arguments, response, task);
 }
 
-eErrorCode_t CLI_CMD_Led_Blink(sMessage_t arguments, sMessage_t *response) {
+eErrorCode_t CLI_CMD_Led_BlinkCount(sMessage_t arguments, sMessage_t *response) {
     if (NULL == response) {
         TRACE_ERR("Invalid data pointer\n");
 
@@ -160,8 +163,8 @@ eErrorCode_t CLI_CMD_Led_Blink(sMessage_t arguments, sMessage_t *response) {
 
     eLed_t led = eLed_Last;
     size_t led_value = 0;
-    size_t blink_time = 0;
-    size_t blink_frequency = 0;
+    size_t total_blinks = 0;
+    size_t blink_frequency_hz = 0;
     eErrorCode_t error = eErrorCode_OK;
 
     error = CMD_Parser_FindNextArgUInt(&arguments, &led_value, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
@@ -170,13 +173,13 @@ eErrorCode_t CLI_CMD_Led_Blink(sMessage_t arguments, sMessage_t *response) {
         return error;
     }
 
-    error = CMD_Parser_FindNextArgUInt(&arguments, &blink_time, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &total_blinks, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
     }
 
-    error = CMD_Parser_FindNextArgUInt(&arguments, &blink_frequency, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+    error = CMD_Parser_FindNextArgUInt(&arguments, &blink_frequency_hz, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
 
     if (eErrorCode_OK != error) {
         return error;
@@ -196,20 +199,20 @@ eErrorCode_t CLI_CMD_Led_Blink(sMessage_t arguments, sMessage_t *response) {
         return eErrorCode_INVAL;
     }
 
-    if (!LED_API_IsCorrectBlinkTime(blink_time)) {
-        snprintf(response->data, response->size, "%d: Incorrect blink time\n", blink_time);
+    if (!LED_API_IsCorrectTotalBlinks(total_blinks)) {
+        snprintf(response->data, response->size, "%d: Incorrect total blinks\n", total_blinks);
 
         return eErrorCode_INVAL;
     }
 
-    if (!LED_API_IsCorrectBlinkFrequency(blink_frequency)) {
-        snprintf(response->data, response->size, "%d: Incorrect blink frequency\n", blink_frequency);
+    if (!LED_API_IsCorrectBlinkFrequency(blink_frequency_hz)) {
+        snprintf(response->data, response->size, "%d: Incorrect blink frequency\n", blink_frequency_hz);
 
         return eErrorCode_INVAL;
     }
 
-    sLedCommandDesc_t formated_task = {.task = eLedTask_Blink, .data = NULL};
-    sLedBlink_t *task_data = Heap_API_Calloc(1, sizeof(sLedBlink_t));
+    sLedCommandDesc_t formated_task = {.task = eLedTask_BlinkCount, .data = NULL};
+    sLedBlinkCount_t *task_data = Heap_API_Calloc(1, sizeof(sLedBlinkCount_t));
 
     if (NULL == task_data) {
         snprintf(response->data, response->size, "Failed Calloc\n");
@@ -218,8 +221,8 @@ eErrorCode_t CLI_CMD_Led_Blink(sMessage_t arguments, sMessage_t *response) {
     }
 
     task_data->led = led;
-    task_data->blink_time = blink_time;
-    task_data->blink_frequency = blink_frequency;
+    task_data->total_blinks = (uint16_t) total_blinks;
+    task_data->blink_frequency_hz = (uint16_t) blink_frequency_hz;
     formated_task.data = task_data;
 
     if (!LED_APP_AddTask(&formated_task)) {
@@ -234,6 +237,103 @@ eErrorCode_t CLI_CMD_Led_Blink(sMessage_t arguments, sMessage_t *response) {
 
     return eErrorCode_OK;
 }
+
+eErrorCode_t CLI_CMD_Led_BlinkDuration(sMessage_t arguments, sMessage_t *response) {
+    if (NULL == response) {
+        TRACE_ERR("Invalid data pointer\n");
+
+        return eErrorCode_NULLPTR;
+    }
+
+    if (NULL == response->data) {
+        TRACE_ERR("Invalid response data pointer\n");
+
+        return eErrorCode_NULLPTR;
+    }
+
+    eLed_t led = eLed_Last;
+    size_t led_value = 0;
+    size_t blink_time_ms = 0;
+    size_t blink_frequency_hz = 0;
+    eErrorCode_t error = eErrorCode_OK;
+
+    error = CMD_Parser_FindNextArgUInt(&arguments, &led_value, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+
+    if (eErrorCode_OK != error) {
+        return error;
+    }
+
+    error = CMD_Parser_FindNextArgUInt(&arguments, &blink_time_ms, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+
+    if (eErrorCode_OK != error) {
+        return error;
+    }
+
+    error = CMD_Parser_FindNextArgUInt(&arguments, &blink_frequency_hz, CMD_SEPARATOR, CMD_SEPARATOR_LENGTH, response);
+
+    if (eErrorCode_OK != error) {
+        return error;
+    }
+
+    if (0 != arguments.size) {
+        snprintf(response->data, response->size, "Too many arguments\n");
+
+        return eErrorCode_ARGMANY;
+    }
+
+    led = led_value;
+
+    if (!LED_Config_IsCorrectLed(led)) {
+        snprintf(response->data, response->size, "%d: Incorrect led\n", led);
+
+        return eErrorCode_INVAL;
+    }
+
+    if (!LED_API_IsCorrectBlinkTime(blink_time_ms)) {
+        snprintf(response->data, response->size, "%d: Incorrect blink time\n", blink_time_ms);
+
+        return eErrorCode_INVAL;
+    }
+
+    if (!LED_API_IsCorrectBlinkFrequency(blink_frequency_hz)) {
+        snprintf(response->data, response->size, "%d: Incorrect blink frequency\n", blink_frequency_hz);
+
+        return eErrorCode_INVAL;
+    }
+
+    sLedCommandDesc_t formated_task = {.task = eLedTask_BlinkDuration, .data = NULL};
+    sLedBlinkDuration_t *task_data = Heap_API_Calloc(1, sizeof(sLedBlinkDuration_t));
+
+    if (NULL == task_data) {
+        snprintf(response->data, response->size, "Failed Calloc\n");
+
+        return eErrorCode_NOMEM;
+    }
+
+    task_data->led = led;
+    task_data->blink_time_ms = blink_time_ms;
+    task_data->blink_frequency_hz = (uint16_t) blink_frequency_hz;
+    formated_task.data = task_data;
+
+    if (!LED_APP_AddTask(&formated_task)) {
+        snprintf(response->data, response->size, "Failed task add\n");
+
+        Heap_API_Free(task_data);
+
+        return eErrorCode_FAILED;
+    }
+
+    snprintf(response->data, response->size, "Operation successful\n");
+
+    return eErrorCode_OK;
+}
+
+eErrorCode_t CLI_CMD_Led_StopBlink(sMessage_t arguments, sMessage_t *response) {
+    eLedTask_t task = eLedTask_StopBlink;
+
+    return CLI_CMD_Led_Common(arguments, response, task);
+}
+
 #endif /* ENABLE_LED */
 
 #if defined(ENABLE_PWM_LED)

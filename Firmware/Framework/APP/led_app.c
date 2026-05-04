@@ -169,8 +169,8 @@ static void LED_APP_Thread(void *pvParameters) {
 
                 Heap_API_Free(arguments);
             } break;
-            case eLedTask_Blink: {
-                sLedBlink_t *arguments = (sLedBlink_t *) g_received_task.data;
+            case eLedTask_BlinkCount: {
+                sLedBlinkCount_t *arguments = (sLedBlinkCount_t *) g_received_task.data;
 
                 if (NULL == arguments) {
                     TRACE_ERR("No arguments\n");
@@ -188,15 +188,15 @@ static void LED_APP_Thread(void *pvParameters) {
                     break;
                 }
 
-                if (!LED_API_IsCorrectBlinkTime(arguments->blink_time)) {
-                    TRACE_ERR("Invalid blink time\n");
+                if (!LED_API_IsCorrectTotalBlinks(arguments->total_blinks)) {
+                    TRACE_ERR("Invalid total blinks\n");
 
                     Heap_API_Free(arguments);
 
                     break;
                 }
 
-                if (!LED_API_IsCorrectBlinkFrequency(arguments->blink_frequency)) {
+                if (!LED_API_IsCorrectBlinkFrequency(arguments->blink_frequency_hz)) {
                     TRACE_ERR("Invalid blink frequency\n");
 
                     Heap_API_Free(arguments);
@@ -204,7 +204,54 @@ static void LED_APP_Thread(void *pvParameters) {
                     break;
                 }
 
-                if (!LED_API_Blink(arguments->led, arguments->blink_time, arguments->blink_frequency)) {
+                if (!LED_API_BlinkCount(arguments->led, arguments->total_blinks, arguments->blink_frequency_hz)) {
+                    TRACE_ERR("LED Blink Count Failed\n");
+
+                    Heap_API_Free(arguments);
+
+                    break;
+                }
+
+                TRACE_INFO("Led [%d] Blink %u times, @ %u Hz\n", arguments->led, arguments->total_blinks, arguments->blink_frequency_hz);
+
+                Heap_API_Free(arguments);
+            } break;
+            case eLedTask_BlinkDuration: {
+                sLedBlinkDuration_t *arguments = (sLedBlinkDuration_t *) g_received_task.data;
+
+                if (NULL == arguments) {
+                    TRACE_ERR("No arguments\n");
+
+                    Heap_API_Free(arguments);
+
+                    break;
+                }
+
+                if (!LED_Config_IsCorrectLed(arguments->led)) {
+                    TRACE_ERR("Invalid Led\n");
+
+                    Heap_API_Free(arguments);
+
+                    break;
+                }
+
+                if (!LED_API_IsCorrectBlinkTime(arguments->blink_time_ms)) {
+                    TRACE_ERR("Invalid blink time\n");
+
+                    Heap_API_Free(arguments);
+
+                    break;
+                }
+
+                if (!LED_API_IsCorrectBlinkFrequency(arguments->blink_frequency_hz)) {
+                    TRACE_ERR("Invalid blink frequency\n");
+
+                    Heap_API_Free(arguments);
+
+                    break;
+                }
+
+                if (!LED_API_BlinkDuration(arguments->led, arguments->blink_time_ms, arguments->blink_frequency_hz)) {
                     TRACE_ERR("LED Blink Failed\n");
 
                     Heap_API_Free(arguments);
@@ -212,7 +259,38 @@ static void LED_APP_Thread(void *pvParameters) {
                     break;
                 }
 
-                TRACE_INFO("Led [%d] Blink %u s, @ %u Hz\n", arguments->led, arguments->blink_time, arguments->blink_frequency);
+                TRACE_INFO("Led [%d] Blink %u s, @ %u Hz\n", arguments->led, arguments->blink_time_ms, arguments->blink_frequency_hz);
+
+                Heap_API_Free(arguments);
+            } break;
+            case eLedTask_StopBlink: {
+                sLedCommon_t *arguments = (sLedCommon_t *) g_received_task.data;
+
+                if (NULL == arguments) {
+                    TRACE_ERR("No arguments\n");
+
+                    Heap_API_Free(arguments);
+
+                    break;
+                }
+
+                if (!LED_Config_IsCorrectLed(arguments->led)) {
+                    TRACE_ERR("Invalid Led\n");
+
+                    Heap_API_Free(arguments);
+
+                    break;
+                }
+
+                if (!LED_API_StopBlink(arguments->led)) {
+                    TRACE_ERR("LED Stop Blink Failed\n");
+
+                    Heap_API_Free(arguments);
+
+                    break;
+                }
+
+                TRACE_INFO("Led [%d] Stop Blink\n", arguments->led);
 
                 Heap_API_Free(arguments);
             } break;

@@ -25,7 +25,9 @@ typedef enum eCliDefaultCmd {
     eCliDefaultCmd_Led_Set,
     eCliDefaultCmd_Led_Reset,
     eCliDefaultCmd_Led_Toggle,
-    eCliDefaultCmd_Led_Blink,
+    eCliDefaultCmd_Led_BlinkCount,
+    eCliDefaultCmd_Led_BlinkDuration,
+    eCliDefaultCmd_Led_StopBlink,
 #endif /* ENABLE_LED */
     
 #if defined(ENABLE_PWM_LED)

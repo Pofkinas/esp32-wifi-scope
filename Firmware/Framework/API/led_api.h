@@ -15,6 +15,8 @@
  * Exported definitions and macros
  *********************************************************************************************************************/
 
+#define LED_BLINK_FOREVER 0U
+
 /**********************************************************************************************************************
  * Exported types
  *********************************************************************************************************************/
@@ -34,7 +36,10 @@ bool LED_API_Init(void);
 bool LED_API_TurnOn(const eLed_t led);
 bool LED_API_TurnOff(const eLed_t led);
 bool LED_API_Toggle(const eLed_t led);
-bool LED_API_Blink(const eLed_t led, const size_t blink_time, const uint16_t blink_frequency);
+bool LED_API_BlinkCount(const eLed_t led, const uint16_t total_blinks, const uint16_t blink_frequency_hz);
+bool LED_API_BlinkDuration(const eLed_t led, const size_t blink_time_ms, const uint16_t blink_frequency_hz);
+bool LED_API_StopBlink(const eLed_t led);
+bool LED_API_IsCorrectTotalBlinks(const uint16_t total_blinks);
 bool LED_API_IsCorrectBlinkTime(const size_t blink_time);
 bool LED_API_IsCorrectBlinkFrequency(const uint16_t blink_frequency);
 #endif /* ENABLE_LED */

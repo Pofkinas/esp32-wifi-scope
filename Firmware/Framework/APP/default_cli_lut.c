@@ -48,10 +48,20 @@ sCmdDesc_t g_default_cmd_lut[eCliDefaultCmd_Last] = {
         .handler = CLI_CMD_Led_Toggle
         /* e. g. led_toggle:<eLed_t> */
     },
-    [eCliDefaultCmd_Led_Blink] = {
-        DEFINE_CMD("led_blink:"),
-        .handler = CLI_CMD_Led_Blink
-        /* e. g. led_blink:<eLed_t>, <duration>, <frequency> */
+    [eCliDefaultCmd_Led_BlinkCount] = {
+        DEFINE_CMD("led_blink_cnt:"),
+        .handler = CLI_CMD_Led_BlinkCount
+        /* e. g. led_blink_count:<eLed_t>, <count>, <frequency_hz> */
+    },
+    [eCliDefaultCmd_Led_BlinkDuration] = {
+        DEFINE_CMD("led_blink_dur:"),
+        .handler = CLI_CMD_Led_BlinkDuration
+        /* e. g. led_blink_duration:<eLed_t>, <duration_ms>, <frequency_hz> */
+    },
+    [eCliDefaultCmd_Led_StopBlink] = {
+        DEFINE_CMD("led_blink_stop:"),
+        .handler = CLI_CMD_Led_StopBlink
+        /* e. g. led_stop_blink:<eLed_t> */
     },
 #endif /* ENABLE_LED */
 

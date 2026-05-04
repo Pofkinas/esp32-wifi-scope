@@ -31,7 +31,9 @@
 eErrorCode_t CLI_CMD_Led_Set(sMessage_t arguments, sMessage_t *response);
 eErrorCode_t CLI_CMD_Led_Reset(sMessage_t arguments, sMessage_t *response);
 eErrorCode_t CLI_CMD_Led_Toggle(sMessage_t arguments, sMessage_t *response);
-eErrorCode_t CLI_CMD_Led_Blink(sMessage_t arguments, sMessage_t *response);
+eErrorCode_t CLI_CMD_Led_BlinkCount(sMessage_t arguments, sMessage_t *response);
+eErrorCode_t CLI_CMD_Led_BlinkDuration(sMessage_t arguments, sMessage_t *response);
+eErrorCode_t CLI_CMD_Led_StopBlink(sMessage_t arguments, sMessage_t *response);
 #endif /* ENABLE_LED */
 
 #if defined(ENABLE_PWM_LED)

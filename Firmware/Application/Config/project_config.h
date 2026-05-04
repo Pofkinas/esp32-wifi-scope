@@ -113,11 +113,13 @@
 //-----------------------------------------------------------------------------
 
 #if defined(ENABLE_LED)
-/// Blink Maximum time (s)
-#define MAX_BLINK_TIME 59
+/// Blink blinks
+#define MAX_TOTAL_BLINKS (UINT16_MAX / 2)
+/// Blink Maximum time (ms)
+#define MAX_BLINK_TIME 60000
 /// Blink frequency limits (Hz)
 #define MIN_BLINK_FREQUENCY 20
-#define MAX_BLINK_FREQUENCY 100
+#define MAX_BLINK_FREQUENCY 1000
 #endif /* ENABLE_LED */
 
 #if defined(ENABLE_PWM_LED)
