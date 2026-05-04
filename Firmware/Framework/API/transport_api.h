@@ -1,47 +1,30 @@
-#ifndef SOURCE_API_DEBUG_API_H_
-#define SOURCE_API_DEBUG_API_H_
+#ifndef SOURCE_API_TRANSPORT_API_H_
+#define SOURCE_API_TRANSPORT_API_H_
 /**********************************************************************************************************************
  * Includes
  *********************************************************************************************************************/
 
 #include "framework_config.h"
 
-#if defined(ENABLE_DEBUG)
+#if defined(ENABLE_TRANSPORT)
 #include <stdbool.h>
 #include <stdint.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include "baudrate.h"
+#include "message.h"
 
 /**********************************************************************************************************************
  * Exported definitions and macros
  *********************************************************************************************************************/
 
-#define CREATE_MODULE_NAME(file_name) static const char *trace_module_name = #file_name;
-#define CREATE_MODULE_NAME_EMPTY static const char *trace_module_name __attribute__((unused)) = NULL;
-
-#if defined(ENABLE_DEBUG)
-#define TRACE_INFO(format, ...) Debug_API_Print(eTraceLevel_Info, trace_module_name, __FILE__, __LINE__, format, ##__VA_ARGS__)
-#define TRACE_WRN(format, ...) Debug_API_Print(eTraceLevel_Warning, trace_module_name, __FILE__, __LINE__, format, ##__VA_ARGS__)
-#define TRACE_ERR(format, ...) Debug_API_Print(eTraceLevel_Error, trace_module_name, __FILE__, __LINE__, format, ##__VA_ARGS__)
-#else
-#define TRACE_INFO(format, ...)
-#define TRACE_WRN(format, ...)
-#define TRACE_ERR(format, ...)
-#endif /* ENABLE_DEBUG */
-
 /**********************************************************************************************************************
  * Exported types
  *********************************************************************************************************************/
 
-typedef enum eTraceLevel {
-    eTraceLevel_First = 0,
-    eTraceLevel_Info = eTraceLevel_First,
-    eTraceLevel_Warning,
-    eTraceLevel_Error,
-    eTraceLevel_Last
-} eTraceLevel_t;
+typedef enum eTransportMode {
+    eTransport_First = 0,
+    eTransport_UART = eTransport_First,
+    eTransport_WiFi_UDP,
+    eTransport_Last
+} eTransportMode_t;
 
 /**********************************************************************************************************************
  * Exported variables
@@ -51,8 +34,11 @@ typedef enum eTraceLevel {
  * Prototypes of exported functions
  *********************************************************************************************************************/
 
-bool Debug_API_Init(const eBaudrate_t baudrate);
-bool Debug_API_Print(const eTraceLevel_t trace_level, const char *file_trace, const char *file_name, const size_t line_number, const char *format, ...);
+bool Transport_API_Init(void);
+bool Transport_API_SetMode(const eTransportMode_t mode);
+eTransportMode_t Transport_API_GetMode(void);
+bool Transport_API_Send(const sMessage_t message, const uint32_t timeout);
+bool Transport_API_Receive(sMessage_t *message, const uint32_t timeout);
 
-#endif /* ENABLE_DEBUG */
-#endif /* SOURCE_API_DEBUG_API_H_ */
+#endif /* ENABLE_TRANSPORT */
+#endif /* SOURCE_API_TRANSPORT_API_H_ */

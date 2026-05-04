@@ -105,6 +105,14 @@ sCmdDesc_t g_default_cmd_lut[eCliDefaultCmd_Last] = {
     },
 #endif /* ENABLE_UDP */
 
+#if defined(ENABLE_TRANSPORT)
+    [eCliCustomCmd_TransportSet] = {
+        DEFINE_CMD("transport_set:"),
+        .handler = Custom_CLI_CMD_TransportSet
+        /* e. g. transport_set:<eTransport_t> */
+    },
+#endif /* ENABLE_TRANSPORT */
+    
     [eCliDefaultCmd_RgbToHsv] = {
         DEFINE_CMD("rgb:"),
         .handler = CLI_CMD_Led_RgbToHsv

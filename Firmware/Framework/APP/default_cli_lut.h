@@ -45,6 +45,10 @@ typedef enum eCliDefaultCmd {
     eCliCustomCmd_UdpSetTarget,
 #endif /* ENABLE_UDP */
 
+#if defined(ENABLE_TRANSPORT)
+    eCliCustomCmd_TransportSet,
+#endif /* ENABLE_TRANSPORT */
+
     eCliDefaultCmd_RgbToHsv,
     eCliDefaultCmd_HsvToRgb,
     eCliDefaultCmd_Last

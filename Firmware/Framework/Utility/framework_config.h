@@ -20,13 +20,13 @@
 #endif /* (ENABLE_UART || ENABLE_PWM || ENABLE_LED || ENABLE_PWM_LED || ENABLE_IO || ENABLE_EXTI ||\
         ) && !ENABLE_GPIO */
 
-#if defined(ENABLE_UART_DEBUG) && !defined(ENABLE_UART)
-#error "DEBUG_UART requires UART to be enabled."
-#endif /* ENABLE_UART_DEBUG && !ENABLE_UART */
+#if defined(ENABLE_DEBUG) && !defined(ENABLE_UART)
+#error "DEBUG requires UART to be enabled."
+#endif /* ENABLE_DEBUG && !ENABLE_UART */
 
-#if defined(ENABLE_CLI) && (!defined(DEBUG_UART) || !defined(ENABLE_UART_DEBUG))
+#if defined(ENABLE_CLI) && (!defined(DEBUG_UART) || !defined(ENABLE_DEBUG))
 #error "CLI requires DEBUG_UART to be enabled."
-#endif /* ENABLE_CLI && (!DEBUG_UART || !ENABLE_UART_DEBUG) */
+#endif /* ENABLE_CLI && (!DEBUG_UART || !ENABLE_DEBUG) */
 
 #if defined(ENABLE_CLI) && !defined(ENABLE_DEFAULT_CMD) && !defined(ENABLE_CUSTOM_CMD)
 #error "CLI requires DEFAULT_CMD or CUSTOM_CMD to be enabled."

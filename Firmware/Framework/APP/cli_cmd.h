@@ -51,6 +51,10 @@ eErrorCode_t Custom_CLI_CMD_WifiStatus(sMessage_t arguments, sMessage_t *respons
 eErrorCode_t Custom_CLI_CMD_UdpSetTarget(sMessage_t arguments, sMessage_t *response);
 #endif /* ENABLE_UDP */
 
+#if defined(ENABLE_TRANSPORT)
+eErrorCode_t Custom_CLI_CMD_TransportSet(sMessage_t arguments, sMessage_t *response);
+#endif /* ENABLE_TRANSPORT */
+
 eErrorCode_t CLI_CMD_Led_RgbToHsv(sMessage_t arguments, sMessage_t *response);
 eErrorCode_t CLI_CMD_Led_HsvToRgb(sMessage_t arguments, sMessage_t *response);
 

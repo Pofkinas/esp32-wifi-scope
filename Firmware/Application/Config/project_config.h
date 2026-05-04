@@ -30,8 +30,8 @@
 /// -- ADC                     // Enable ADC functionality
 #define ENABLE_ADC
 
-/// -- DEBUG UART              // Enable Debug UART functionality
-#define ENABLE_UART_DEBUG
+/// -- DEBUG                   // Enable Debug functionality
+#define ENABLE_DEBUG
 
 /// -- CLI                     // Enable Command Line Interface (CLI) over UART
 #define ENABLE_CLI
@@ -59,6 +59,7 @@
 #define ENABLE_UDP
 
 /// Misc
+#define ENABLE_TRANSPORT
 #define ENABLE_CAPTURE
 #define ENABLE_VOLTAGE
 
@@ -100,21 +101,10 @@
 
 #if defined(ENABLE_UART)
 #define UART0 eUart_Debug
-#define UART_0_BAUDRATE eBaudrate_1000000
+#define UART_0_BAUDRATE eBaudrate_2000000
 
 #define UART_API_MESSAGE_QUEUE_CAPACITY 10
 #define UART_API_MESSAGE_QUEUE_PUT_TIMEOUT 0U
-
-#if defined(ENABLE_UART_DEBUG)
-#define DEBUG_UART UART0
-
-#define DEBUG_DELIMITER "\r\n"
-#define DEBUG_MESSAGE_SIZE 512
-#define UART_DEBUG_BUFFER_CAPACITY 512
-
-#define DEBUG_MESSAGE_TIMEOUT 1000
-#define DEBUG_MUTEX_TIMEOUT 0U
-#endif /* ENABLE_UART_DEBUG */
 #endif /* ENABLE_UART */
 
 //=============================================================================
@@ -151,7 +141,18 @@
 // DEBUG
 //-----------------------------------------------------------------------------
 
-#if defined(ENABLE_UART_DEBUG)
+#if defined(ENABLE_DEBUG)
+#if defined(ENABLE_UART)
+#define DEBUG_UART UART0
+#endif /* ENABLE_UART */
+
+#define DEBUG_DELIMITER "\r\n"
+#define DEBUG_MESSAGE_SIZE 512
+#define UART_DEBUG_BUFFER_CAPACITY 512
+
+#define DEBUG_MESSAGE_TIMEOUT 1000
+#define DEBUG_MUTEX_TIMEOUT 0U
+
 // Custom debug flags
 #define DEBUG_MAIN
 #define CUSTOM_CLI_CMD_HANDLERS
@@ -171,6 +172,8 @@
 #define DEBUG_CAPTURE_API
 #define DEBUG_WIFI_API
 #define DEBUG_UDP_API
+#define DEBUG_TRANSPORT_API
+#endif /* ENABLE_DEBUG */
 
 //=============================================================================
 // MISCELLANEOUS
@@ -188,6 +191,11 @@
 #endif /* ENABLE_DEFAULT_CMD || ENABLE_CUSTOM_CMD */
 
 #define HEAP_API_MUTEX_TIMEOUT 0U
+
+#if defined(ENABLE_TRANSPORT)
+#define TRANSPORT_API_TARGET_UART DEBUG_UART
+#define TRANSPORT_API_TARGET_UDP eUdp_Socket0
+#endif /* ENABLE_TRANSPORT */
 
 #define BYTE 8
 #define BASE_10 10

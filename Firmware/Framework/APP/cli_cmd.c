@@ -30,6 +30,10 @@
 #include "transport_config.h"
 #endif /* ENABLE_UDP */
 
+#if defined(ENABLE_TRANSPORT)
+#include "transport_api.h"
+#endif /* ENABLE_TRANSPORT */
+
 /**********************************************************************************************************************
  * Private definitions and macros
  *********************************************************************************************************************/
@@ -805,6 +809,56 @@ eErrorCode_t Custom_CLI_CMD_UdpSetTarget(sMessage_t arguments, sMessage_t *respo
     return eErrorCode_OK;
 }
 #endif /* ENABLE_UDP */
+
+#if defined(ENABLE_TRANSPORT)
+eErrorCode_t Custom_CLI_CMD_TransportSet(sMessage_t arguments, sMessage_t *response) {
+    if ((NULL == response) || (NULL == response->data)) {
+        TRACE_ERR("Invalid response pointer\n");
+
+        return eErrorCode_NULLPTR;
+    }
+
+    char *separator_ptr = NULL;
+    eErrorCode_t error = CMD_Parser_ParseToken(&separator_ptr, &arguments, CMD_SEPARATOR, response);
+
+    if (eErrorCode_OK != error) {
+        return error;
+    }
+
+    eTransportMode_t mode = eTransport_Last;
+
+    if (0 == strncmp(arguments.data, "uart", 4)) {
+        mode = eTransport_UART;
+    } else if (0 == strncmp(arguments.data, "wifi", 4)) {
+        mode = eTransport_WiFi_UDP;
+    } else {
+        snprintf(response->data, response->size, "Unknown transport [%s]; Use uart|wifi\n", arguments.data);
+
+        return eErrorCode_BADOPT;
+    }
+
+    if (NULL != separator_ptr) {
+        arguments.size -= (separator_ptr - arguments.data + CMD_SEPARATOR_LENGTH);
+        arguments.data = separator_ptr + CMD_SEPARATOR_LENGTH;
+
+        if (0 != arguments.size) {
+            snprintf(response->data, response->size, "Too many arguments\n");
+
+            return eErrorCode_ARGMANY;
+        }
+    }
+
+    if (!Transport_API_SetMode(mode)) {
+        snprintf(response->data, response->size, "Failed to set transport\n");
+
+        return eErrorCode_FAILED;
+    }
+
+    snprintf(response->data, response->size, "Operation successful\n");
+
+    return eErrorCode_OK;
+}
+#endif /* ENABLE_TRANSPORT */
 
 eErrorCode_t CLI_CMD_Led_RgbToHsv(sMessage_t arguments, sMessage_t *response) {
     if (NULL == response) {

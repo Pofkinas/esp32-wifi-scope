@@ -4,7 +4,7 @@
 
 #include "debug_api.h"
 
-#if defined(ENABLE_UART_DEBUG)
+#if defined(ENABLE_DEBUG)
 
 #include "uart_api.h"
 #include "message.h"
@@ -134,4 +134,4 @@ bool Debug_API_Print(const eTraceLevel_t trace_level, const char *file_trace, co
     return is_sent;
 }
 
-#endif /* ENABLE_UART_DEBUG */
+#endif /* ENABLE_DEBUG */
